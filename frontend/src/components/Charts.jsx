@@ -1,5 +1,19 @@
+import Piecharts from "./PieCharts"
+
+
 const Charts = () => {
-    return ( <h1>Charts</h1> );
+    return (
+        <div>
+        <div style={{display:'inline-block',width:'20%'}}>
+        
+        </div>
+        <div style={{display:'inline-block',width:'80%'}}>
+        <Piecharts />
+        </div>
+        </div>
+        );
 }
  
 export default Charts;
+
+    
