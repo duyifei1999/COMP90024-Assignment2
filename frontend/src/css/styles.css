@@ -43,3 +43,12 @@ nav div:hover {
 nav div:hover a {
     color: black;
 }
+
+#homebackground {
+    background-image: url("../image/试用背景.jpg");
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
