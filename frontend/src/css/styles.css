@@ -1,0 +1,9 @@
+:root {
+    --nav-bar-height: 50px;
+}
+
+.map-container {
+    width: 100vw;
+    height: calc(100vh - var(--nav-bar-height));
+    min-height: 600px;
+}
