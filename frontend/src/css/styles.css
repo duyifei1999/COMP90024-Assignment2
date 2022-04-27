@@ -44,11 +44,117 @@ nav div:hover a {
     color: black;
 }
 
+h1,h2 {
+    text-align: center;
+    text-transform: uppercase;
+}
+
+p {
+    left: 2%;
+    margin: 2px;
+}
+
 #homebackground {
-    background-image: url("../image/试用背景.jpg");
+    background-image: url("../image/background1.jpg");
     position: absolute;
     width: 100%;
-    height: 100%;
+    height: 40%;
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
+}
+
+#hometext {
+    width: 50%;
+    height: 60%;
+    position: absolute;
+    top: 30%;
+    left: 25%;
+    font-family: "UD Digi Kyokasho NK-B";
+}
+
+#projectinfo {
+    position: absolute;
+    top: 55%;
+    left: 15%;
+    width: 70%;
+    height: 60%;
+}
+
+#memberinfo {
+    position: absolute;
+    top: 115%;
+    width: 100vw;
+    height: 40%;
+    background-image: url("../image/background2.jpg");
+    background-attachment: fixed
+}
+
+#chartsinfo {
+    width: 50%;
+    height:600pt;
+    left: 5%;
+    top: 25%;
+}
+
+.member {
+    position: absolute;
+    width: 12vw;
+    height: 12vw;
+    background-size: cover;
+
+}
+
+.memberinfo {
+    color: white;
+    position: absolute;
+    width: 12vw;
+    height: 12vw;
+    top: 20vw;
+    text-align: center;
+}
+
+#m1 {
+    background-image: url("../image/Rui.jpg");
+    left: 10vw;
+}
+
+#m2 {
+     background-image: url("../image/Zhaopeng.jpg");
+     left: 27vw;
+}
+
+#m3 {
+     background-image: url("../image/Yuer.jpg");
+     left: 44vw;
+}
+
+#m4 {
+     background-image: url("../image/Liyan.jpg");
+     left: 61vw;
+}
+
+#m5 {
+     background-image: url("../image/Yifei.jpg");
+     left: 78vw;
+}
+
+#m11 {
+    left: 10vw;
+}
+
+#m12 {
+     left: 27vw;
+}
+
+#m13 {
+     left: 44vw;
+}
+
+#m14 {
+     left: 61vw;
+}
+
+#m15 {
+     left: 78vw;
 }

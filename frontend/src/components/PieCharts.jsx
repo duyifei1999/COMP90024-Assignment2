@@ -9,15 +9,15 @@ class Piecharts extends Component {
                 text: 'Test for Assignment2',
                 subtext: 'Melbourn live search',
                 left: 'center',
-                top: '5%'
+                top: '10%'
             },
             tooltip: {
                 trigger: 'item'
             },
             legend: {
                 orient: 'vertical',
-                right: '5%',
-                top: '20%'
+                right: '7%',
+                top: '30%'
             },
             series: [{
                 
