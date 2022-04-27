@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import jsonData from "../resources/vic.json";
 import Loading from "./Loading";
+import SuburbDetail from "./SuburbDetail";
 
 const Map = () => {
   const [loading, SetLoading] = useState(true);
+  const [suburb, SetSuburb] = useState("");
 
   useEffect(() => {
     if (!window.google) {
@@ -28,23 +30,24 @@ const Map = () => {
       zoom: 10,
     });
 
+    // TODO: get the data from the backend
     const suburbs = JSON.parse(JSON.stringify(jsonData));
     map.data.addGeoJson(suburbs);
 
     map.data.setStyle((f) => {
+      // TODO: color the suburb based on its weight
       return {
         fillColor: "#" + Math.floor(Math.random() * 16777215).toString(16),
       };
     });
 
-    map.data.addListener("mousedown", (e) => {
-      console.log(e.feature.getProperty("SSC_NAME"));
-    });
     map.data.addListener("mouseover", (e) => {
       map.data.overrideStyle(e.feature, { strokeWeight: 8 });
+      SetSuburb(e.feature.getProperty("SSC_NAME"));
     });
     map.data.addListener("mouseout", (e) => {
       map.data.revertStyle();
+      SetSuburb("");
     });
 
     setTimeout(() => {
@@ -56,6 +59,7 @@ const Map = () => {
     <>
       {loading && <Loading />}
       <div className="map-container" id="map" />
+      <SuburbDetail suburb={suburb} />
     </>
   );
 };
