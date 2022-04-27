@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import jsonData from "../resources/vic.json";
+import jsonData from "../resources/aurin_test.json";
 import Loading from "./Loading";
 import SuburbDetail from "./SuburbDetail";
 
@@ -37,13 +37,15 @@ const Map = () => {
     map.data.setStyle((f) => {
       // TODO: color the suburb based on its weight
       return {
+        strokeWeight: 1,
         fillColor: "#" + Math.floor(Math.random() * 16777215).toString(16),
       };
     });
 
     map.data.addListener("mouseover", (e) => {
-      map.data.overrideStyle(e.feature, { strokeWeight: 8 });
-      SetSuburb(e.feature.getProperty("SSC_NAME"));
+      map.data.overrideStyle(e.feature, { strokeWeight: 2 });
+      SetSuburb(e.feature.getProperty("sa2_name"));
+      // SetSuburb(e.feature.getProperty("SSC_NAME"));
     });
     map.data.addListener("mouseout", (e) => {
       map.data.revertStyle();
