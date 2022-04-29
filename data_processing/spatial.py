@@ -6,15 +6,17 @@ def main():
     tool = SpatialTool()
     tool.load_region_info("sa2.json");
 
-    print("data from assignment 1")
+    print("data from assignment 1\n")
     tweets = prepare_tweets();
     for t in tweets:
         coord = t["doc"]["coordinates"]["coordinates"]
+        print(coord)
         print(tool.locate(coord))
 
-    print("\ndata for testing")
+    print("\ndata for testing\n")
     coords = [[144.98612887599475, -37.764432171690665], [144.90837224601452, -37.75982712869952], [144.9219292006105, -37.825349797919344], [145.1127864874854, -37.792401682684954]]
     for coord in coords:
+        print(coord)
         print(tool.locate(coord))
 
 class SpatialTool:

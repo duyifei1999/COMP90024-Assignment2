@@ -5,7 +5,7 @@ def extract_regions_from_file(filepath):
     data = json.load(open(filepath, 'r'))
     extracted = []
     for f in data["features"]:
-        # only want regions within Melbourne region
+        # only want suburbs within the Melbourne region
         code = f["properties"]["sa2_code"][:3]
         if "206" <= code <= "213":
             region = {}
