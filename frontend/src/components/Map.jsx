@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import jsonData from "../resources/aurin_test.json";
+import jsonData from "../resources/sa2.json";
 import Loading from "./Loading";
 import SuburbDetail from "./SuburbDetail";
 
