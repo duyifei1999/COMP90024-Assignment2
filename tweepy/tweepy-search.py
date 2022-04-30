@@ -1,7 +1,7 @@
 import os
 import json
 from tweepy import Client
-file = open('search.json', 'w')
+file = open('search_housing.json', 'w')
 ls=[]
 ls2=[]
 if __name__ == "__main__":
@@ -87,5 +87,5 @@ if __name__ == "__main__":
                     counter += 1
                     '''
 
-    initial=json.dumps({"data":ls})
+    initial=json.dumps(ls)
     file.write(initial)

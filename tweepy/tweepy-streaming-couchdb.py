@@ -2,11 +2,11 @@ import os
 import logging
 import json
 from tweepy import StreamingClient, StreamRule, Tweet
+import couchdb
 
 
 file = open('stream.json', 'w')
 ls=[]
-
 
 class TweetListener(StreamingClient):
     """
@@ -37,6 +37,8 @@ class TweetListener(StreamingClient):
             ls[-1]['geo']['full_name']=place['full_name']
             ls[-1]['geo']['country']=place['country']
             ls[-1]['geo']['geo']=place['geo']       
+        
+        db_tweets.save(ls[-1])
         print(ls[-1])
 
     def on_request_error(self, status_code):
@@ -44,6 +46,7 @@ class TweetListener(StreamingClient):
 
     def on_connection_error(self):
         self.disconnect()
+
 
 
 if __name__ == "__main__":
@@ -54,7 +57,7 @@ if __name__ == "__main__":
      - If security has been compromised, regenerate it
      - DO NOT store it in public places or shared docs
     """
-    bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+    bearer_token =os.getenv("TWITTER_BEARER_TOKEN")
 
     if not bearer_token:
         raise RuntimeError("Not found bearer token")
@@ -94,18 +97,26 @@ if __name__ == "__main__":
 
     # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
     print(client.get_rules())
-    
+
+    db_tweet_name = 'tweets'
+    db_address = "http://127.0.0.1:5984/"
+    db_server = couchdb.Server(db_address)
+    db_server.resource.credentials = ('admin', 'admin')
+    print(db_server)
+    if db_tweet_name in db_server:
+        db_tweets = db_server[db_tweet_name]
+    else:
+        db_tweets = db_server.create(db_tweet_name)
+
+
     tweet_fields="lang,geo,created_at,public_metrics"
     expansions="author_id,geo.place_id"
     place_fields="country,geo,contained_within,country_code,id,name,place_type,full_name"
     user_fields="id,location,name,public_metrics"
-    # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream
-    
-    
-    
+
     try:
         client.filter(tweet_fields=tweet_fields,expansions=expansions,place_fields=place_fields,user_fields=user_fields)
     except KeyboardInterrupt:
-        initial=json.dumps({"data":ls})
+        initial=json.dumps(ls)
         file.write(initial)
         client.disconnect()
