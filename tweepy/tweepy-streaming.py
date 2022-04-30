@@ -106,6 +106,6 @@ if __name__ == "__main__":
     try:
         client.filter(tweet_fields=tweet_fields,expansions=expansions,place_fields=place_fields,user_fields=user_fields)
     except KeyboardInterrupt:
-        initial=json.dumps({"data":ls})
+        initial=json.dumps(ls)
         file.write(initial)
         client.disconnect()
