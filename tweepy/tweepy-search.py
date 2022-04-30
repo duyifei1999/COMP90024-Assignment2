@@ -1,7 +1,7 @@
 import os
 import json
 from tweepy import Client
-file = open('search_housing.json', 'w')
+file = open('search_transportation.json', 'w')
 ls=[]
 ls2=[]
 if __name__ == "__main__":
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     client = Client(bearer_token)
 
     # https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query
-    query = "melbourne housing"
+    query = "melbourne transportation"
     tweet_fields="lang,geo,created_at,public_metrics"
     expansions="author_id,geo.place_id"
     place_fields="country,geo,contained_within,country_code,id,name,place_type,full_name"
