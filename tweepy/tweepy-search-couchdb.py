@@ -1,7 +1,9 @@
 import os
 import json
 from tweepy import Client
+import couchdb
 file = open('search_housing.json', 'w')
+
 ls=[]
 ls2=[]
 if __name__ == "__main__":
@@ -17,6 +19,18 @@ if __name__ == "__main__":
         raise RuntimeError("Not found bearer token")
 
     client = Client(bearer_token)
+
+
+    db_tweet_name = 'tweets'
+    db_address = "http://127.0.0.1:5984/"
+    db_server = couchdb.Server(db_address)
+    db_server.resource.credentials = ('admin', 'admin')
+    print(db_server)
+    if db_tweet_name in db_server:
+        db_tweets = db_server[db_tweet_name]
+    else:
+        db_tweets = db_server.create(db_tweet_name)
+
 
     # https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query
     query = "melbourne housing"
@@ -56,6 +70,7 @@ if __name__ == "__main__":
                             data_json['geo']['geo']=place['geo']       
                 print(data_json)
                 ls.append(data_json)
+                db_tweets.save(data_json)
                 counter += 1
     '''
     while resp.meta["next_token"] and counter < limit:

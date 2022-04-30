@@ -1,4 +1,5 @@
 import json
-file = open('test.json', 'w')
-initial=json.dumps({"data":[]})
-print(initial+'\n')
+file = open('stream.json', 'r')
+file1=json.load(file)
+for x in file1:
+    print(x)
