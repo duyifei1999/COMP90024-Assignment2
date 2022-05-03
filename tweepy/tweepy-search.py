@@ -57,8 +57,8 @@ if __name__ == "__main__":
                 print(data_json)
                 ls.append(data_json)
                 counter += 1
-    '''
-    while resp.meta["next_token"] and counter < limit:
+    
+    '''while resp.meta["next_token"] and counter < limit:
         resp = client.search_recent_tweets(query, tweet_fields=tweet_fields,expansions=expansions,place_fields=place_fields,user_fields=user_fields,max_results=max_results, next_token=resp.meta["next_token"])
         if resp.errors:
             raise RuntimeError(resp.errors)
@@ -85,7 +85,7 @@ if __name__ == "__main__":
                     print(data_json)
                     ls2.append(data_json)
                     counter += 1
-                    '''
+    '''
 
     initial=json.dumps(ls)
     file.write(initial)

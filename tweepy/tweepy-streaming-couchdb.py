@@ -1,5 +1,4 @@
 import os
-import logging
 import json
 from tweepy import StreamingClient, StreamRule, Tweet
 import couchdb
