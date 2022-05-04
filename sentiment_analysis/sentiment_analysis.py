@@ -7,9 +7,9 @@ import pandas as pd
 
 sns.set(font_scale=1.5, style="white")
 
-# 显示所有列
+# display all columns
 pd.set_option('display.max_columns', None)
-# # 显示所有行
+# display all rows
 pd.set_option('display.max_rows', None)
 
 # read json file
