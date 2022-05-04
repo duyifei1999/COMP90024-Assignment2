@@ -32,7 +32,7 @@ plt.title("Polarization for Melbourne housing")
 plt.xlabel("Value")
 plt.ylabel("Frequency")
 plt.show()
-# plt.savefig("sentiment_housing.png")
+# plt.savefig("sentiment_opportunity.png")
 
 d = json.load(open("search_opportunity.json"))
 sentiment = []
