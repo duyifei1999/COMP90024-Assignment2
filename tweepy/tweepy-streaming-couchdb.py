@@ -8,11 +8,7 @@ file = open('stream.json', 'w')
 ls=[]
 
 class TweetListener(StreamingClient):
-    """
-    StreamingClient allows filtering and sampling of realtime Tweets using Twitter API v2.
-    https://docs.tweepy.org/en/latest/streamingclient.html#tweepy.StreamingClient
-    """
-
+ 
     def on_tweet(self, tweet: Tweet):
         print(tweet.__repr__())
         data_json=tweet.data
