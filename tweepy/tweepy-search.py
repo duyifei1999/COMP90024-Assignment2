@@ -5,12 +5,8 @@ file = open('search_housing.json', 'w')
 ls=[]
 ls2=[]
 if __name__ == "__main__":
-    """
-     - Save it in a secure location
-     - Treat it like a password or a set of keys
-     - If security has been compromised, regenerate it
-     - DO NOT store it in public places or shared docs
-    """
+
+
     bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
 
     if not bearer_token:
@@ -18,7 +14,6 @@ if __name__ == "__main__":
 
     client = Client(bearer_token)
 
-    # https://developer.twitter.com/en/docs/twitter-api/tweets/search/integrate/build-a-query
     query = "melbourne housing"
     tweet_fields="lang,geo,created_at,public_metrics"
     expansions="author_id,geo.place_id"
@@ -29,7 +24,6 @@ if __name__ == "__main__":
     limit = 100
     counter = 0
 
-    # https://docs.tweepy.org/en/stable/client.html#search-tweets
     resp = client.search_recent_tweets(query,tweet_fields=tweet_fields,expansions=expansions,place_fields=place_fields,user_fields=user_fields, max_results=max_results)
     if resp.errors:
         raise RuntimeError(resp.errors)

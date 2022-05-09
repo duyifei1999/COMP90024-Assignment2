@@ -20,7 +20,6 @@ class TweetListener(StreamingClient):
         data_json['geo']=tweet.geo
         data_json['author']={}
         data_json.pop('author_id',None)
-        print(data_json)
         ls.append(data_json)
     
     def on_includes(self, includes: dict):
@@ -61,19 +60,11 @@ if __name__ == "__main__":
 
     client = TweetListener(bearer_token)
 
-    # https://docs.tweepy.org/en/latest/streamingclient.html#streamrule
-    # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
-    # Operator availability (check the operators table)
-    # - Core operators: Available when using any access level.
-    # - Advanced operators: Available when using a Project with Academic Research access.
-    # keyword:
-    #   - "melbourne"
+
     rules = [
-        StreamRule(value="melbourne")
+        StreamRule(value="melbourne housing")
     ]
 
-    # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/post-tweets-search-stream-rules
-    # Remove existing rules
     resp = client.get_rules()
     if resp and resp.data:
         rule_ids = []
@@ -82,24 +73,20 @@ if __name__ == "__main__":
 
         client.delete_rules(rule_ids)   
 
-    # Validate the rule
     resp = client.add_rules(rules, dry_run=True)
     if resp.errors:
         raise RuntimeError(resp.errors)
 
-    # Add the rule
     resp = client.add_rules(rules)
     if resp.errors:
         raise RuntimeError(resp.errors)
 
-    # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
     print(client.get_rules())
     
     tweet_fields="lang,geo,created_at,public_metrics"
     expansions="author_id,geo.place_id"
     place_fields="country,geo,contained_within,country_code,id,name,place_type,full_name"
     user_fields="id,location,name,public_metrics"
-    # https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream
     
     
     
