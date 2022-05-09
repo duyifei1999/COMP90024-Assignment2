@@ -56,7 +56,7 @@ if __name__ == "__main__":
      - If security has been compromised, regenerate it
      - DO NOT store it in public places or shared docs
     """
-    bearer_token =os.getenv("TWITTER_BEARER_TOKEN")
+    bearer_token ="AAAAAAAAAAAAAAAAAAAAAK2pbgEAAAAATvCBArjuyqKMl6PSdHaIJEWXmrs%3DFmBZJotjIUAEfAu1PNMUXTEzmzT1UQGcMbIxxdndHWp7Qpn7Ub"
 
     if not bearer_token:
         raise RuntimeError("Not found bearer token")
@@ -64,8 +64,7 @@ if __name__ == "__main__":
     client = TweetListener(bearer_token)
 
     rules = [
-        StreamRule(value="melbourne housing"),
-        StreamRule(value="melbourne house")
+        StreamRule(value="melbourne")
     ]
 
     resp = client.get_rules()
