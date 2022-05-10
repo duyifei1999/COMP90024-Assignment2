@@ -2,9 +2,9 @@ import os
 import json
 from tweepy import StreamingClient, StreamRule, Tweet
 import couchdb
-
-
-file = open('stream.json', 'w')
+from textblob import TextBlob
+from data_processing.spatial import SpatialTool
+file = open('tweets_housing.txt', 'a')
 ls=[]
 
 class TweetListener(StreamingClient):
@@ -31,15 +31,28 @@ class TweetListener(StreamingClient):
             ls[-1]['geo']['full_name']=place['full_name']
             ls[-1]['geo']['country']=place['country']
             ls[-1]['geo']['geo']=place['geo']       
-        db_tweets.save(ls[-1])
+        if ls[-1]['geo']!=None and ls[-1]['geo']!={}:
+            coord=[]
+            coord.append((ls[-1]['geo']['geo']['bbox'][0]+ls[-1]['geo']['geo']['bbox'][2])/2)
+            coord.append((ls[-1]['geo']['geo']['bbox'][1]+ls[-1]['geo']['geo']['bbox'][3])/2)
+
+            place=SpatialTool.locate(coords=coord)
+            if place !='outside melbourne':
+                ls[-1]['sa2']=place
+                text=ls[-1]['text']
+                blob = TextBlob(text)
+                value = blob.sentiment.polarity
+                ls[-1]['sentiment']=value
+                db_tweets.save(ls[-1])
+                file.write(json.dumps(ls[-1])+'\n')
+                file.flush()
         print(ls[-1])
 
     def on_request_error(self, status_code):
         print(status_code)
 
     def on_connection_error(self):
-        initial=json.dumps(ls)
-        file.write(initial)
+
         self.disconnect()
 
 
@@ -56,7 +69,8 @@ if __name__ == "__main__":
 
     rules = [
         StreamRule(value="melbourne housing"),
-        StreamRule(value="melbourne house")
+        StreamRule(value="melbourne house"),
+        StreamRule(value="melbourne residential")
     ]
 
     resp = client.get_rules()
@@ -77,7 +91,7 @@ if __name__ == "__main__":
 
     print(client.get_rules())
 
-    db_tweet_name = 'tweets'
+    db_tweet_name = 'tweets_housing'
     db_address = "http://127.0.0.1:5984/"
     db_server = couchdb.Server(db_address)
     db_server.resource.credentials = ('admin', 'admin')
@@ -96,6 +110,5 @@ if __name__ == "__main__":
     try:
         client.filter(tweet_fields=tweet_fields,expansions=expansions,place_fields=place_fields,user_fields=user_fields)
     except KeyboardInterrupt:
-        initial=json.dumps(ls)
-        file.write(initial)
+
         client.disconnect()
