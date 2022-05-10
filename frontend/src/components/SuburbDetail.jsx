@@ -1,10 +1,8 @@
 import React from "react";
 import { useEffect } from "react";
 
-const SuburbDetail = ({ suburb, clearSuburb }) => {
-  useEffect(() => {
-    console.log(suburb);
-  }, [suburb]);
+const SuburbDetail = ({ suburb }) => {
+  useEffect(() => {}, [suburb]);
 
   return (
     <div
