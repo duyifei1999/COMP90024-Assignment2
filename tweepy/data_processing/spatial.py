@@ -23,7 +23,7 @@ class SpatialTool:
     regions = {};
     
     def load_region_info(self, filepath):
-        with open("sa2.json", "r") as f:
+        with open(filepath, "r") as f:
             for f in json.load(f)["features"]:
                 for multipolygon in f["geometry"]["coordinates"]:
                     self.regions[f["properties"]["sa2_code"]] = \

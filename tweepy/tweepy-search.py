@@ -7,7 +7,7 @@ ls2=[]
 if __name__ == "__main__":
 
 
-    bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+    bearer_token = os.getenv("TWITTER_BEARER_TOKEN").strip('\r')
 
     if not bearer_token:
         raise RuntimeError("Not found bearer token")
