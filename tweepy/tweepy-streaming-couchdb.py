@@ -7,7 +7,7 @@ from data_processing.spatial import SpatialTool
 file = open('tweets_housing.txt', 'a')
 ls=[]
 tool = SpatialTool()
-tool.load_region_info("data_processing/sa2.json");
+tool.load_region_info("data_processing/sa2.json")
 class TweetListener(StreamingClient):
  
     def on_tweet(self, tweet: Tweet):
