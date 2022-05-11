@@ -57,7 +57,7 @@ class TweetListener(StreamingClient):
         self.disconnect()
 
 if __name__ == "__main__":
-    bearer_token = os.getenv("TWITTER_BEARER_TOKEN").strip('\r')
+    bearer_token = "AAAAAAAAAAAAAAAAAAAAAHZVbgEAAAAAvpnilWaKBuzRrxRWFTcMlDC0kuQ%3D3kEbYripBQeQRBRZrW7xYF1Apd7k4elWdbDHKOH5x7306gc4ir"
 
     if not bearer_token:
         raise RuntimeError("Not found bearer token")
