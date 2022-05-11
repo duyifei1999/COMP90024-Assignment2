@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 5000:5000
+    image: frontend
+    container_name: frontend_container
+    command: npm start
+  
+  backend:
+    build: ./backend
+    environment:
+      - CHOUCHDB_HOST=http://admin:admin@172.26.129.154:5984
+      - SERVER_PORT=3000
+    ports:
+      - 3000:3000
+    image: backend
+    container_name: backend_container
