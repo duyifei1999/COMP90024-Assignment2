@@ -62,7 +62,7 @@ if __name__ == "__main__":
      - If security has been compromised, regenerate it
      - DO NOT store it in public places or shared docs
     """
-    bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+    bearer_token = os.getenv("TWITTER_BEARER_TOKEN").strip('\r')
 
     if not bearer_token:
         raise RuntimeError("Not found bearer token")

@@ -2,11 +2,12 @@ import os
 import json
 from tweepy import StreamingClient, StreamRule, Tweet
 import couchdb
-
-
-file = open('stream.json', 'w')
+from textblob import TextBlob
+from data_processing.spatial import SpatialTool
+file = open('tweets_housing.txt', 'a')
 ls=[]
-
+tool = SpatialTool()
+tool.load_region_info("data_processing/sa2.json")
 class TweetListener(StreamingClient):
  
     def on_tweet(self, tweet: Tweet):
@@ -31,15 +32,27 @@ class TweetListener(StreamingClient):
             ls[-1]['geo']['full_name']=place['full_name']
             ls[-1]['geo']['country']=place['country']
             ls[-1]['geo']['geo']=place['geo']       
-        db_tweets.save(ls[-1])
+        if ls[-1]['geo']!=None and ls[-1]['geo']!={}:
+            coord=[]
+            coord.append((ls[-1]['geo']['geo']['bbox'][0]+ls[-1]['geo']['geo']['bbox'][2])/2)
+            coord.append((ls[-1]['geo']['geo']['bbox'][1]+ls[-1]['geo']['geo']['bbox'][3])/2)
+            place=tool.locate(coords=coord)
+            if place !='outside melbourne':
+                ls[-1]['sa2']=place
+                text=ls[-1]['text']
+                blob = TextBlob(text)
+                value = blob.sentiment.polarity
+                ls[-1]['sentiment']=value
+                db_tweets.save(ls[-1])
+                file.write(json.dumps(ls[-1])+'\n')
+                file.flush()
         print(ls[-1])
 
     def on_request_error(self, status_code):
         print(status_code)
 
     def on_connection_error(self):
-        initial=json.dumps(ls)
-        file.write(initial)
+
         self.disconnect()
 
 
@@ -52,15 +65,18 @@ if __name__ == "__main__":
      - If security has been compromised, regenerate it
      - DO NOT store it in public places or shared docs
     """
-    bearer_token ="AAAAAAAAAAAAAAAAAAAAAK2pbgEAAAAATvCBArjuyqKMl6PSdHaIJEWXmrs%3DFmBZJotjIUAEfAu1PNMUXTEzmzT1UQGcMbIxxdndHWp7Qpn7Ub"
-
+    bearer_token = os.getenv("TWITTER_BEARER_TOKEN").strip('\r')
     if not bearer_token:
         raise RuntimeError("Not found bearer token")
 
     client = TweetListener(bearer_token)
-
+    
     rules = [
-        StreamRule(value="melbourne")
+
+        StreamRule(value="melbourne housing"),
+        StreamRule(value="melbourne house"),
+        StreamRule(value="melbourne residential")
+
     ]
 
     resp = client.get_rules()
@@ -81,8 +97,8 @@ if __name__ == "__main__":
 
     print(client.get_rules())
 
-    db_tweet_name = 'tweets'
-    db_address = "http://127.0.0.1:5984/"
+    db_tweet_name = 'tweets_housing'
+    db_address = "http://localhost:5984/"
     db_server = couchdb.Server(db_address)
     db_server.resource.credentials = ('admin', 'admin')
     print(db_server)
@@ -100,6 +116,5 @@ if __name__ == "__main__":
     try:
         client.filter(tweet_fields=tweet_fields,expansions=expansions,place_fields=place_fields,user_fields=user_fields)
     except KeyboardInterrupt:
-        initial=json.dumps(ls)
-        file.write(initial)
+
         client.disconnect()

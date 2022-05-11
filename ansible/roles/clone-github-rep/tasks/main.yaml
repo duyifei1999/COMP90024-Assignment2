@@ -1,22 +1,5 @@
 ---
 
-- name: copy github ssh key
-  copy:
-    src: "config/git_key.pem"
-    dest: /home/ubuntu/.ssh/git_key
-    owner: ubuntu
-    group: ubuntu
-    mode: 0600
-
-
-- name: configure ssh to use ansible key for github.com
-  template:
-    src: "config/ssh_config"
-    dest: /home/ubuntu/.ssh/config
-    owner: ubuntu
-    group: ubuntu
-    mode: 0644
-
 - name: Delete remote working directory if exists
   file:
     state: absent
@@ -29,6 +12,6 @@
     mode: 0755
 
 - name: git clone
-  shell: git clone git@github.com:yunfeijing/ccc-p2.git --config core.sshCommand="ssh -i /home/ubuntu/.ssh/git_key"
+  shell: git clone https://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@github.com/duyifei1999/COMP90024-Assignment2.git
   args:
     chdir: '{{ remote_working_directory }}'
