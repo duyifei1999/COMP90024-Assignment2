@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
 
     db_tweet_name = 'tweets_housing'
-    db_address = "http://127.0.0.1:5984/"
+    db_address = "http://localhost:5984/"
     db_server = couchdb.Server(db_address)
     db_server.resource.credentials = ('admin', 'admin')
     print(db_server)
