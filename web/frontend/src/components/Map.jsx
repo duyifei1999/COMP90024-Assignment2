@@ -61,7 +61,7 @@ const Map = () => {
         query = query.concat("?group_level=3");
         break;
     }
-    console.log(query);
+    // console.log(query);
     const res = await axios.get(query);
     return res.data.rows;
   };
@@ -70,34 +70,34 @@ const Map = () => {
     // console.log(properties);
 
     let geoJson;
-    let codeLength;
+    let keyPos;
     let propertyName;
 
     switch (saLevel) {
       case 3:
         geoJson = JSON.parse(JSON.stringify(SA3));
-        codeLength = 5;
+        keyPos = 1;
         propertyName = "SA3_CODE16";
         break;
       case 4:
         geoJson = JSON.parse(JSON.stringify(SA4));
-        codeLength = 3;
+        keyPos = 0;
         propertyName = "SA4_CODE16";
         break;
       case 2:
       default:
         geoJson = JSON.parse(JSON.stringify(SA2));
-        codeLength = 9;
+        keyPos = 2;
         propertyName = "SA2_MAIN16";
         break;
     }
 
     const dict = {};
     for (let i = 0; i < properties.length; i++) {
-      const saCode = properties[i].key.substring(0, codeLength);
-      if (dict[saCode])
-        dict[saCode].raw = dict[saCode].raw + properties[i].value;
-      else dict[saCode] = { raw: properties[i].value };
+      const item = properties[i];
+      const key = item.key[keyPos];
+      dict[key] = item.value;
+      dict[key].mean = dict[key].sum / dict[key].count;
     }
     normalize(dict);
 
@@ -105,19 +105,13 @@ const Map = () => {
       const feature = geoJson.features[i];
       const saCode = feature.properties[propertyName];
 
-      feature.properties.metaData = {};
+      feature.properties.metaData = { ...dict[saCode] };
       feature.properties.metaData.saCode = saCode;
       feature.properties.metaData.name =
         feature.properties[`SA${saLevel}_NAME16`];
-
-      if (dict[saCode]) {
-        feature.properties.metaData.rawScore = dict[saCode].raw;
-        feature.properties.metaData.normalizedScore = dict[saCode].normalized;
-      } else {
-        feature.properties.metaData.rawScore = 0;
-        feature.properties.metaData.normalizedScore = 0;
-      }
     }
+
+    console.log(geoJson);
 
     return geoJson;
   };
@@ -126,10 +120,9 @@ const Map = () => {
     SetLoading(true);
     clearMap();
 
-    const features = await fetchData(db, category, saLevel);
-    console.log(features);
+    const data = await fetchData(db, category, saLevel);
 
-    const geoJson = addPropertiesToFeatures(features, saLevel);
+    const geoJson = addPropertiesToFeatures(data, saLevel);
     map.data.addGeoJson(geoJson);
     map.data.setStyle((f) => {
       return {
@@ -141,7 +134,6 @@ const Map = () => {
     map.data.addListener("mouseover", (e) => {
       map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
       SetSuburb(e.feature.getProperty("metaData"));
-      // SetSuburb(e.feature.getProperty("SA2_NAME16"));
     });
     map.data.addListener("mouseout", (e) => {
       map.data.revertStyle();

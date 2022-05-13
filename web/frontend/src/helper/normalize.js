@@ -1,9 +1,10 @@
 const normalize = (dict) => {
   let min = 999;
   let max = -999;
+
   for (const key in dict) {
-    min = dict[key].raw < min ? dict[key].raw : min;
-    max = dict[key].raw > max ? dict[key].raw : max;
+    min = dict[key].mean < min ? dict[key].mean : min;
+    max = dict[key].mean > max ? dict[key].mean : max;
   }
 
   const range = max - min;
@@ -13,7 +14,7 @@ const normalize = (dict) => {
   // console.log(max);
 
   for (const key in dict) {
-    dict[key].normalized = (dict[key].raw - min) / range;
+    dict[key].normalizedMean = (dict[key].mean - min) / range;
   }
 };
 
