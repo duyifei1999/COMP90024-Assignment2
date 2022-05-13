@@ -48,7 +48,6 @@ nav div:hover a {
   position: fixed; 
     width: 30vw; 
     max-width: 400px;
-    height: 180px;
     bottom: 30px;
     left: 10px;
     background-color: rgb(255, 255, 255); 

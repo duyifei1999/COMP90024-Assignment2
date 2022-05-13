@@ -3,3 +3,5 @@ csv_to_json.py
 *.csv
 *.json
 !SA2_2016_MELB.json
+!SA3_2016_MELB.json
+!SA4_2016_MELB.json

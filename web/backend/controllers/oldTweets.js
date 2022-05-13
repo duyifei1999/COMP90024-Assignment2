@@ -19,7 +19,7 @@ const getLanguage = async (req, res) => {
   try {
     const old_tweets = await db.use("old_tweets");
     const result = await old_tweets.view("data_processing", "language", {
-      group_level: req.query.group_level,
+      group_level: req.query.group_level || 1,
     });
     res.send(result);
   } catch (e) {

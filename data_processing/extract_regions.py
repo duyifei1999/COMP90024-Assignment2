@@ -7,7 +7,7 @@ def extract_regions_from_file(filepath):
         extracted = []
         for f in data["features"]:
             # only want suburbs within the Melbourne region
-            code = f["properties"]["SA2_MAIN16"][:3]
+            code = f["properties"]["SA4_CODE16"][:3]
             if "206" <= code <= "214":
                 extracted.append(f)
 

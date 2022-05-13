@@ -7,19 +7,12 @@ const SuburbDetail = ({ suburb }) => {
   return (
     <div
       className={
-        suburb === ""
-          ? "suburb-container suburb-container--empty"
-          : "suburb-container"
+        suburb ? "suburb-container" : "suburb-container suburb-container--empty"
       }
     >
-      <h1>{suburb}</h1>
-      {suburb !== "" && (
-        <p>
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsum
-          possimus quam laudantium dignissimos cupiditate veritatis, magnam sint
-          delectus quasi repudiandae.
-        </p>
-      )}
+      {suburb && <h1>{suburb.name}</h1>}
+      {suburb && <h3>Averaged Score: {suburb.rawScore}</h3>}
+      {suburb && <h3>Normalized Score: {suburb.normalizedScore}</h3>}
     </div>
   );
 };
