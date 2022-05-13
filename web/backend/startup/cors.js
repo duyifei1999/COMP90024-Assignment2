@@ -1,11 +1,9 @@
 const cors = require("cors");
 
-const whitelist = "localhost:5000";
-
 module.exports = function (app) {
   app.use(
     cors({
-      origin: whitelist,
+      origin: "http://localhost:5000",
       // access-control-allow-credentials: true,
       credentials: true,
       optionSuccessStatus: 200,

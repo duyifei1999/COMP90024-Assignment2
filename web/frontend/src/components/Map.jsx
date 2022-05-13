@@ -19,6 +19,7 @@ const featureColor = (f) => {
 const Map = () => {
   const [loading, SetLoading] = useState(true);
   const [suburb, SetSuburb] = useState("");
+  const [mapObj, SetMapObj] = useState(null);
 
   useEffect(() => {
     if (!window.google) {
@@ -44,36 +45,44 @@ const Map = () => {
       mapId: "a84fedb5a34cfce9",
     });
 
+    setTimeout(() => {
+      SetLoading(false);
+    }, 1000);
+
+    SetMapObj(map);
+  };
+
+  const loadAURIN = () => {
+    SetLoading(true);
+
     // TODO: get the data from the backend
     const suburbs = JSON.parse(JSON.stringify(jsonData));
-    map.data.addGeoJson(suburbs);
+    mapObj.data.addGeoJson(suburbs);
 
-    map.data.setStyle((f) => {
-      // TODO: color the suburb based on its weight
+    mapObj.data.setStyle((f) => {
       return {
         strokeWeight: 0.1,
         fillColor: featureColor(f),
       };
     });
 
-    map.data.addListener("mouseover", (e) => {
-      map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
+    mapObj.data.addListener("mouseover", (e) => {
+      mapObj.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
       SetSuburb(e.feature.getProperty("SA2_NAME16"));
       // SetSuburb(e.feature.getProperty("SSC_NAME"));
     });
-    map.data.addListener("mouseout", (e) => {
-      map.data.revertStyle();
+    mapObj.data.addListener("mouseout", (e) => {
+      mapObj.data.revertStyle();
       SetSuburb("");
     });
 
-    setTimeout(() => {
-      SetLoading(false);
-    }, 1000);
+    SetLoading(false);
   };
 
   return (
     <>
       {loading && <Loading />}
+      <button onClick={loadAURIN}>Test</button>
       <div className="map-container" id="map" />
       <SuburbDetail suburb={suburb} />
     </>
