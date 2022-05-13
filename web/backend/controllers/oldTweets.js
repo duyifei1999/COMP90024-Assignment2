@@ -3,21 +3,31 @@ const db = require("nano")(
 );
 
 const getHousing = async (req, res) => {
-  res.send("Housing");
+  try {
+    const old_tweets = await db.use("old_tweets");
+    const result = await old_tweets.view("data_processing", "housing", {
+      group_level: 1,
+      key: req.query.key,
+    });
+    res.send(result);
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
 };
 
 const getLanguage = async (req, res) => {
-  res.send("Language");
-};
-
-const getTesting = async (req, res) => {
-   const old_tweets = await db.use("old_tweets");
-   const test = await old_tweets.get("007a9db5e190cc6d79fadb4f1b0008a1");
-   res.send(test);
+  try {
+    const old_tweets = await db.use("old_tweets");
+    const result = await old_tweets.view("data_processing", "language", {
+      group_level: req.query.group_level,
+    });
+    res.send(result);
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
 };
 
 module.exports = {
   getHousing,
   getLanguage,
-  getTesting,
 };

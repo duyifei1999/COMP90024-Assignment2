@@ -1,3 +1,5 @@
 *.txt
 csv_to_json.py
 *.csv
+*.json
+!SA2_2016_MELB.json
