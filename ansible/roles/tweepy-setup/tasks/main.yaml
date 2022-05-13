@@ -1,31 +1,57 @@
 ---
 # Build Docker image for tweepy
 
-- name: Build an image and push it to local repo _realtime
-  docker_image:
+- name: Build an image and push tweepy_housing
+  community.docker.docker_image:
     build:
-      path: "/home/ubuntu/COMP90024/COMP90024-Assignment2/tweepy"
+      path: "/home/ubuntu/COMP90024A2/COMP90024-Assignment2/tweepy_housing"
       pull: yes
-    name: tweepy
+    name: tweepy_housing
     tag: latest
     source: build
-    force: yes
+  become: yes
+  environment: "{{ proxy_env }}"
+
+- name: Build an image and push tweepy_language
+  community.docker.docker_image:
+    build:
+      path: "/home/ubuntu/COMP90024A2/COMP90024-Assignment2/tweepy_language"
+      pull: yes
+    name: tweepy_language
+    tag: latest
+    source: build
   become: yes
   environment: "{{ proxy_env }}"
 
 # Stop existing Docker containers for Twitter Harvesters and remove them (if any)
-- name: Stop tweepy Docker container
+- name: Stop tweepy_housing Docker container
   become: yes
   docker_container:
-    name: tweepy
+    name: tweepy_housing
+    state: absent
+
+- name: Stop tweepy_language Docker container
+  become: yes
+  docker_container:
+    name: tweepy_language
     state: absent
 
 # Create new docker container for Crawler and start container
-- name: Create and start tweepy Docker container
+- name: Create and start tweepy_housing Docker container
   become: yes
   docker_container:
-    name: tweepy
-    image: tweepy
+    name: tweepy_housing
+    image: tweepy_housing
+    state: started
+    pull: false
+    recreate: true
+    restart_policy: always
+
+- name: Create and start tweepy_housing Docker container
+  become: yes
+  docker_container:
+    name: tweepy_language
+    image: tweepy_language
     state: started
     pull: false
     recreate: true
