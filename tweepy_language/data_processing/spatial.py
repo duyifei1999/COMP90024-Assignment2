@@ -4,20 +4,22 @@ from shapely.geometry import Point, Polygon, MultiPolygon
 def main():
 
     tool = SpatialTool()
-    tool.load_region_info("sa2.json");
+    tool.load_region_info("SA2_2016_MELB.json");
 
-    print("data from assignment 1\n")
-    tweets = prepare_tweets();
-    for t in tweets:
-        coord = t["doc"]["coordinates"]["coordinates"]
-        print(coord)
-        print(tool.locate(coord))
-
-    print("\ndata for testing\n")
-    coords = [[144.98612887599475, -37.764432171690665], [144.90837224601452, -37.75982712869952], [144.9219292006105, -37.825349797919344], [145.1127864874854, -37.792401682684954]]
+    # Example usage:
+    coords = [[145.15877, -38.38235], [144.98612887599475, -37.764432171690665], [144.90837224601452, -37.75982712869952], [144.9219292006105, -37.825349797919344], [145.1127864874854, -37.792401682684954]]
     for coord in coords:
         print(coord)
         print(tool.locate(coord))
+
+    # Using data from assignment 1
+    # tweets = prepare_tweets();
+    # for t in tweets:
+    #     coord = t["doc"]["coordinates"]["coordinates"]
+    #     print(coord)
+    #     print(tool.locate(coord))
+
+
 
 class SpatialTool:
     regions = {};
@@ -25,9 +27,14 @@ class SpatialTool:
     def load_region_info(self, filepath):
         with open(filepath, "r") as f:
             for f in json.load(f)["features"]:
-                for multipolygon in f["geometry"]["coordinates"]:
-                    self.regions[f["properties"]["sa2_code"]] = \
-                        MultiPolygon([Polygon([tuple(p) for p in polygon]) for polygon in multipolygon])
+                if f["geometry"]["type"] == "Polygon":
+                    for polygon in f["geometry"]["coordinates"]:
+                        self.regions[f["properties"]["SA2_MAIN16"]] = \
+                            Polygon([tuple(p) for p in polygon])
+                else:
+                    for multi_polygon in f["geometry"]["coordinates"]:
+                        self.regions[f["properties"]["SA2_MAIN16"]] = \
+                            MultiPolygon([Polygon([tuple(p) for p in polygon]) for polygon in multi_polygon])
 
     def locate(self, coords):
         """
