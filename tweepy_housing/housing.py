@@ -6,7 +6,7 @@ from textblob import TextBlob
 from data_processing.spatial import SpatialTool
 file = open('housing.txt', 'a')
 tool = SpatialTool()
-tool.load_region_info("data_processing/sa2.json")
+tool.load_region_info("data_processing/SA2_2016_MELB.json")
 ls=[]
 
 class TweetListener(StreamingClient):
