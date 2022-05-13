@@ -16,7 +16,6 @@ const Map = () => {
   const [loading, SetLoading] = useState(true);
   const [suburb, SetSuburb] = useState(null);
   const [map, SetMap] = useState(null);
-  const [data, SetData] = useState({ query: "", features: null });
 
   useEffect(() => {
     const initMap = () => {
@@ -47,11 +46,24 @@ const Map = () => {
     SetLoading(false);
   }, []);
 
-  const fetchData = async (query) => {
-    if (query === "/oldTweets/housing") {
-      const res = await axios.get(query);
-      return res.data.rows;
+  const fetchData = async (db, category, saLevel) => {
+    let query = "".concat(db, "/", category, "/");
+
+    switch (saLevel) {
+      case 3:
+        query = query.concat("?group_level=2");
+        break;
+      case 4:
+        query = query.concat("?group_level=1");
+        break;
+      case 2:
+      default:
+        query = query.concat("?group_level=3");
+        break;
     }
+    console.log(query);
+    const res = await axios.get(query);
+    return res.data.rows;
   };
 
   const addPropertiesToFeatures = (properties, saLevel) => {
@@ -89,33 +101,33 @@ const Map = () => {
     }
     normalize(dict);
 
-    for (let i = 0; i < geoJson["features"].length; i++) {
-      const feature = geoJson["features"][i];
-      const saCode = feature["properties"][propertyName];
+    for (let i = 0; i < geoJson.features.length; i++) {
+      const feature = geoJson.features[i];
+      const saCode = feature.properties[propertyName];
+
+      feature.properties.metaData = {};
+      feature.properties.metaData.saCode = saCode;
+      feature.properties.metaData.name =
+        feature.properties[`SA${saLevel}_NAME16`];
 
       if (dict[saCode]) {
-        feature["properties"].rawScore = dict[saCode].raw;
-        feature["properties"].normalizedScore = dict[saCode].normalized;
+        feature.properties.metaData.rawScore = dict[saCode].raw;
+        feature.properties.metaData.normalizedScore = dict[saCode].normalized;
       } else {
-        feature["properties"].rawScore = 0;
-        feature["properties"].normalizedScore = 0;
+        feature.properties.metaData.rawScore = 0;
+        feature.properties.metaData.normalizedScore = 0;
       }
     }
 
     return geoJson;
   };
 
-  const addDataToMap = async (query, saLevel) => {
+  const addDataToMap = async (db, category, saLevel) => {
     SetLoading(true);
     clearMap();
 
-    let features;
-    if (query !== data.query) {
-      features = await fetchData(query);
-      SetData({ query, features });
-    } else {
-      features = data.features;
-    }
+    const features = await fetchData(db, category, saLevel);
+    console.log(features);
 
     const geoJson = addPropertiesToFeatures(features, saLevel);
     map.data.addGeoJson(geoJson);
@@ -128,12 +140,7 @@ const Map = () => {
 
     map.data.addListener("mouseover", (e) => {
       map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
-      const s = {
-        name: e.feature.getProperty(`SA${saLevel}_NAME16`),
-        rawScore: e.feature.getProperty("rawScore"),
-        normalizedScore: e.feature.getProperty("normalizedScore"),
-      };
-      SetSuburb(s);
+      SetSuburb(e.feature.getProperty("metaData"));
       // SetSuburb(e.feature.getProperty("SA2_NAME16"));
     });
     map.data.addListener("mouseout", (e) => {
@@ -156,21 +163,21 @@ const Map = () => {
       <button onClick={clearMap}>Clear</button>
       <button
         onClick={() => {
-          addDataToMap("/oldTweets/housing", 2);
+          addDataToMap("oldTweets", "housing", 2);
         }}
       >
         Old Tweets Housing SA2
       </button>
       <button
         onClick={() => {
-          addDataToMap("/oldTweets/housing", 3);
+          addDataToMap("oldTweets", "housing", 3);
         }}
       >
         Old Tweets Housing SA3
       </button>
       <button
         onClick={() => {
-          addDataToMap("/oldTweets/housing", 4);
+          addDataToMap("oldTweets", "housing", 4);
         }}
       >
         Old Tweets Housing SA4
