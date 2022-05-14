@@ -23,11 +23,12 @@ const DataSelector = ({ addDataToMap }) => {
       <Select
         className="data-selector__select"
         clearable={true}
-        placeholder={"Tweets Collection"}
+        placeholder={"Data Collection"}
         onChange={handleCollectionChange}
       >
         <Select.Option value="old_tweets">Old Tweets</Select.Option>
         <Select.Option value="new_tweets">New Tweets</Select.Option>
+        <Select.Option value="aurin">AURIN Data</Select.Option>
       </Select>
       <Select
         className="data-selector__select"
