@@ -11,6 +11,7 @@ import SA4 from "../resources/SA4_2016_MELB.json";
 
 import Loading from "./Loading";
 import SuburbDetail from "./SuburbDetail";
+import DataSelector from "./DataSelector";
 
 const Map = () => {
   const [loading, SetLoading] = useState(true);
@@ -46,33 +47,39 @@ const Map = () => {
     SetLoading(false);
   }, []);
 
-  const fetchData = async (db, category, saLevel) => {
-    if (category === "housing") {
-      let query = "".concat(db, "/", category, "/");
+  const fetchData = async (db, scenario, saLevel) => {
+    try {
+      if (scenario === "housing") {
+        let query = "".concat(db, "/", scenario, "/");
 
-      switch (saLevel) {
-        case 3:
-          query = query.concat("?group_level=2");
-          break;
-        case 4:
-          query = query.concat("?group_level=1");
-          break;
-        case 2:
-        default:
-          query = query.concat("?group_level=3");
-          break;
+        switch (saLevel) {
+          case 3:
+            query = query.concat("?group_level=2");
+            break;
+          case 4:
+            query = query.concat("?group_level=1");
+            break;
+          case 2:
+          default:
+            query = query.concat("?group_level=3");
+            break;
+        }
+        // console.log(query);
+        // console.log(saLevel);
+        const res = await axios.get(query);
+        return res.data.rows;
+      } else {
+        // TODO: fetch language data
+        return null;
       }
-      // console.log(query);
-      const res = await axios.get(query);
-      return res.data.rows;
-    } else {
-      // TODO: fetch language data
+    } catch (e) {
+      alert("Fetch Data Failed!");
       return null;
     }
   };
 
-  const addPropertiesToFeatures = (properties, category, saLevel) => {
-    if (category === "housing") {
+  const addPropertiesToFeatures = (properties, scenario, saLevel) => {
+    if (scenario === "housing") {
       let geoJson;
       let keyPos;
       let propertyName;
@@ -113,7 +120,7 @@ const Map = () => {
         feature.properties.metaData.saCode = saCode;
         feature.properties.metaData.name =
           feature.properties[`SA${saLevel}_NAME16`];
-        feature.properties.metaData.category = category;
+        feature.properties.metaData.scenario = scenario;
       }
 
       return geoJson;
@@ -123,31 +130,40 @@ const Map = () => {
     }
   };
 
-  const addDataToMap = async (db, category, saLevel) => {
+  const addDataToMap = async (db, scenario, saLevel) => {
     SetLoading(true);
     clearMap();
 
-    const data = await fetchData(db, category, saLevel);
+    const data = await fetchData(db, scenario, saLevel);
 
-    const geoJson = addPropertiesToFeatures(data, category, saLevel);
-    map.data.addGeoJson(geoJson);
-    map.data.setStyle((f) => {
-      return {
-        strokeWeight: 0.1,
-        fillColor: featureColor(f),
-      };
-    });
+    if (data) {
+      const geoJson = addPropertiesToFeatures(data, scenario, saLevel);
 
-    map.data.addListener("mouseover", (e) => {
-      map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
-      SetSuburb(e.feature.getProperty("metaData"));
-    });
-    map.data.addListener("mouseout", (e) => {
-      map.data.revertStyle();
-      SetSuburb(null);
-    });
+      map.data.addGeoJson(geoJson);
+      map.data.setStyle((f) => {
+        return {
+          strokeWeight: 0.1,
+          fillColor: featureColor(f),
+        };
+      });
 
-    SetLoading(false);
+      map.data.addListener("mouseover", (e) => {
+        map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
+        SetSuburb(e.feature.getProperty("metaData"));
+      });
+      map.data.addListener("mouseout", (e) => {
+        map.data.revertStyle();
+        SetSuburb(null);
+      });
+
+      // Waiting a little bit for the map to update the data layer
+      setTimeout(() => {
+        SetLoading(false);
+      }, 500);
+    } else {
+      // fetch data failed, set loading to false and return
+      SetLoading(false);
+    }
   };
 
   const clearMap = () => {
@@ -159,36 +175,8 @@ const Map = () => {
   return (
     <>
       {loading && <Loading />}
-      <button onClick={clearMap}>Clear</button>
-      <button
-        onClick={() => {
-          addDataToMap("oldTweets", "housing", 2);
-        }}
-      >
-        Old Tweets Housing SA2
-      </button>
-      <button
-        onClick={() => {
-          addDataToMap("oldTweets", "housing", 3);
-        }}
-      >
-        Old Tweets Housing SA3
-      </button>
-      <button
-        onClick={() => {
-          addDataToMap("oldTweets", "housing", 4);
-        }}
-      >
-        Old Tweets Housing SA4
-      </button>
-      <button
-        onClick={() => {
-          addDataToMap("/oldTweets/language", 4);
-        }}
-      >
-        Old Tweets Language SA4
-      </button>
       <div className="map-container" id="map" />
+      <DataSelector addDataToMap={addDataToMap} />
       <SuburbDetail suburb={suburb} />
     </>
   );

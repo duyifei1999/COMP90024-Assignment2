@@ -9,10 +9,10 @@ const SuburbDetail = ({ suburb }) => {
         suburb ? "suburb-container" : "suburb-container suburb-container--empty"
       }
     >
-      {suburb && suburb.category === "housing" && (
+      {suburb && suburb.scenario === "housing" && (
         <SuburbHousingDetail suburb={suburb} />
       )}
-      {suburb && suburb.category === "language" && (
+      {suburb && suburb.scenario === "language" && (
         <SuburbLanguageDetail suburb={suburb} />
       )}
     </div>
