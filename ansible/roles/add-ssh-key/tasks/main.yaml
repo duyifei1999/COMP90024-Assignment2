@@ -1,8 +1,0 @@
----
-- name: add ssh key
-  copy:
-    src: "config/SSH.pem"
-    dest: /home/ubuntu/.ssh/SSH.pem
-#    owner: ubuntu
-#    group: ubuntu
-    mode: 0600

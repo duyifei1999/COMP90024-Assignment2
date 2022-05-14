@@ -1,0 +1,6 @@
+---
+- name: add ssh key
+  copy:
+    src: "config/SSH.pem"
+    dest: /home/ubuntu/.ssh/SSH.pem
+    mode: 0600
