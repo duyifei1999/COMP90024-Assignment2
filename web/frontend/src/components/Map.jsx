@@ -1,26 +1,34 @@
 import React, { useEffect, useState } from "react";
-import jsonData from "../resources/SA2_2016.json";
+
+import axios from "../helper/axios";
+import featureColor from "../helper/featureColor";
+import normalize from "../helper/normalize";
+
+import SA2 from "../resources/SA2_2016_MELB.json";
+import SA3 from "../resources/SA3_2016_MELB.json";
+import SA4 from "../resources/SA4_2016_MELB.json";
+import AURINHousing from "../resources/AURIN_melb_housing.json";
+
 import Loading from "./Loading";
 import SuburbDetail from "./SuburbDetail";
-import AURINData from "../resources/AURIN_melb_housing.json";
-
-const COLORMIN = [255, 255, 255, 0];
-const COLORMAX = [225, 108, 88, 255];
-
-const featureColor = (f) => {
-  const fraction = (AURINData[f.getProperty("SA2_MAIN16")] + 1) / 2 || 0;
-  const R = Math.floor((COLORMAX[0] - COLORMIN[0]) * fraction) + COLORMIN[0];
-  const G = Math.floor((COLORMAX[1] - COLORMIN[1]) * fraction) + COLORMIN[1];
-  const B = Math.floor((COLORMAX[2] - COLORMIN[2]) * fraction) + COLORMIN[2];
-  const A = Math.floor((COLORMAX[3] - COLORMIN[3]) * fraction) + COLORMIN[3];
-  return `rgba(${R}, ${G}, ${B}, ${A})`;
-};
+import DataSelector from "./DataSelector";
 
 const Map = () => {
   const [loading, SetLoading] = useState(true);
-  const [suburb, SetSuburb] = useState("");
+  const [suburb, SetSuburb] = useState(null);
+  const [map, SetMap] = useState(null);
 
   useEffect(() => {
+    const initMap = () => {
+      SetMap(
+        new window.google.maps.Map(document.getElementById("map"), {
+          center: { lat: -37.79769851966677, lng: 144.9607993840227 }, // coord of UoM
+          zoom: 10,
+          mapId: "a84fedb5a34cfce9",
+        })
+      );
+    };
+
     if (!window.google) {
       var s = document.createElement("script");
       s.type = "text/javascript";
@@ -35,46 +43,209 @@ const Map = () => {
     } else {
       initMap();
     }
+
+    SetLoading(false);
   }, []);
 
-  const initMap = () => {
-    const map = new window.google.maps.Map(document.getElementById("map"), {
-      center: { lat: -37.79769851966677, lng: 144.9607993840227 }, // coord of UoM
-      zoom: 10,
-      mapId: "a84fedb5a34cfce9",
-    });
+  const fetchData = async (db, scenario, saLevel) => {
+    try {
+      if (scenario === "housing") {
+        let query = "".concat(db, "/", scenario, "/");
 
-    // TODO: get the data from the backend
-    const suburbs = JSON.parse(JSON.stringify(jsonData));
-    map.data.addGeoJson(suburbs);
+        switch (saLevel) {
+          case 3:
+            query = query.concat("?group_level=2");
+            break;
+          case 4:
+            query = query.concat("?group_level=1");
+            break;
+          case 2:
+          default:
+            query = query.concat("?group_level=3");
+            break;
+        }
+        // console.log(query);
+        // console.log(saLevel);
+        const res = await axios.get(query);
+        return res.data.rows;
+      } else {
+        // TODO: fetch language data
+        return null;
+      }
+    } catch (e) {
+      alert("Fetch Data Failed!");
+      return null;
+    }
+  };
 
+  const addPropertiesToFeatures = (properties, scenario, saLevel) => {
+    if (scenario === "housing") {
+      let geoJson;
+      let keyPos;
+      let propertyName;
+
+      switch (saLevel) {
+        case 3:
+          geoJson = JSON.parse(JSON.stringify(SA3));
+          keyPos = 1;
+          propertyName = "SA3_CODE16";
+          break;
+        case 4:
+          geoJson = JSON.parse(JSON.stringify(SA4));
+          keyPos = 0;
+          propertyName = "SA4_CODE16";
+          break;
+        case 2:
+        default:
+          geoJson = JSON.parse(JSON.stringify(SA2));
+          keyPos = 2;
+          propertyName = "SA2_MAIN16";
+          break;
+      }
+
+      const dict = {};
+      for (let i = 0; i < properties.length; i++) {
+        const item = properties[i];
+        const key = item.key[keyPos];
+        dict[key] = item.value;
+        dict[key].mean = dict[key].sum / dict[key].count;
+      }
+      normalize(dict);
+
+      for (let i = 0; i < geoJson.features.length; i++) {
+        const feature = geoJson.features[i];
+        const saCode = feature.properties[propertyName];
+
+        feature.properties.metaData = { ...dict[saCode] };
+        feature.properties.metaData.saCode = saCode;
+        feature.properties.metaData.name =
+          feature.properties[`SA${saLevel}_NAME16`];
+        feature.properties.metaData.scenario = scenario;
+      }
+
+      return geoJson;
+    } else {
+      // TODO: process language data
+      return null;
+    }
+  };
+
+  const addAURINPropertiesToFeatures = (scenario, saLevel) => {
+    if (scenario === "housing") {
+      let geoJson;
+      let keyLength;
+      let propertyName;
+
+      switch (saLevel) {
+        case 3:
+          geoJson = JSON.parse(JSON.stringify(SA3));
+          keyLength = 5;
+          propertyName = "SA3_CODE16";
+          break;
+        case 4:
+          geoJson = JSON.parse(JSON.stringify(SA4));
+          keyLength = 3;
+          propertyName = "SA4_CODE16";
+          break;
+        case 2:
+        default:
+          geoJson = JSON.parse(JSON.stringify(SA2));
+          keyLength = 9;
+          propertyName = "SA2_MAIN16";
+          break;
+      }
+
+      const dict = {};
+      Object.entries(AURINHousing).forEach(([saCode, score]) => {
+        const key = saCode.substring(0, keyLength);
+        if (dict[key]) {
+          dict[key].sum += score;
+          dict[key].count += 1;
+          dict[key].min = dict[key].min < score ? dict[key].min : score;
+          dict[key].max = dict[key].max > score ? dict[key].max : score;
+        } else {
+          dict[key] = {};
+          dict[key].sum = score;
+          dict[key].count = 1;
+          dict[key].min = score;
+          dict[key].max = score;
+        }
+      });
+
+      Object.keys(dict).forEach((key) => {
+        dict[key].mean = dict[key].sum / dict[key].count;
+      });
+      normalize(dict);
+
+      for (let i = 0; i < geoJson.features.length; i++) {
+        const feature = geoJson.features[i];
+        const saCode = feature.properties[propertyName];
+
+        feature.properties.metaData = { ...dict[saCode] };
+        feature.properties.metaData.saCode = saCode;
+        feature.properties.metaData.name =
+          feature.properties[`SA${saLevel}_NAME16`];
+        feature.properties.metaData.scenario = scenario;
+      }
+
+      return geoJson;
+    } else {
+      // TODO: process language data
+      return null;
+    }
+  };
+
+  const loadGeoJson = (geoJson, scenario) => {
+    map.data.addGeoJson(geoJson);
     map.data.setStyle((f) => {
-      // TODO: color the suburb based on its weight
       return {
         strokeWeight: 0.1,
-        fillColor: featureColor(f),
+        fillColor: featureColor(f, scenario),
       };
     });
 
     map.data.addListener("mouseover", (e) => {
       map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
-      SetSuburb(e.feature.getProperty("SA2_NAME16"));
-      // SetSuburb(e.feature.getProperty("SSC_NAME"));
+      SetSuburb(e.feature.getProperty("metaData"));
     });
     map.data.addListener("mouseout", (e) => {
       map.data.revertStyle();
-      SetSuburb("");
+      SetSuburb(null);
     });
+  };
 
-    setTimeout(() => {
-      SetLoading(false);
-    }, 1000);
+  const addDataToMap = async (db, scenario, saLevel) => {
+    SetLoading(true);
+    clearMap();
+
+    let geoJson;
+
+    if (db !== "aurin") {
+      // fetch data from db
+      const data = await fetchData(db, scenario, saLevel);
+      if (data) {
+        geoJson = addPropertiesToFeatures(data, scenario, saLevel);
+      }
+    } else {
+      // directly load AURIN data from resources folder
+      geoJson = addAURINPropertiesToFeatures(scenario, saLevel);
+    }
+
+    loadGeoJson(geoJson, scenario);
+    SetLoading(false);
+  };
+
+  const clearMap = () => {
+    map.data.forEach((feature) => {
+      map.data.remove(feature);
+    });
   };
 
   return (
     <>
       {loading && <Loading />}
       <div className="map-container" id="map" />
+      <DataSelector addDataToMap={addDataToMap} />
       <SuburbDetail suburb={suburb} />
     </>
   );
