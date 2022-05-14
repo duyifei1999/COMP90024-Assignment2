@@ -47,73 +47,80 @@ const Map = () => {
   }, []);
 
   const fetchData = async (db, category, saLevel) => {
-    let query = "".concat(db, "/", category, "/");
+    if (category === "housing") {
+      let query = "".concat(db, "/", category, "/");
 
-    switch (saLevel) {
-      case 3:
-        query = query.concat("?group_level=2");
-        break;
-      case 4:
-        query = query.concat("?group_level=1");
-        break;
-      case 2:
-      default:
-        query = query.concat("?group_level=3");
-        break;
+      switch (saLevel) {
+        case 3:
+          query = query.concat("?group_level=2");
+          break;
+        case 4:
+          query = query.concat("?group_level=1");
+          break;
+        case 2:
+        default:
+          query = query.concat("?group_level=3");
+          break;
+      }
+      // console.log(query);
+      const res = await axios.get(query);
+      return res.data.rows;
+    } else {
+      // TODO: fetch language data
+      return null;
     }
-    // console.log(query);
-    const res = await axios.get(query);
-    return res.data.rows;
   };
 
-  const addPropertiesToFeatures = (properties, saLevel) => {
-    // console.log(properties);
+  const addPropertiesToFeatures = (properties, category, saLevel) => {
+    if (category === "housing") {
+      let geoJson;
+      let keyPos;
+      let propertyName;
 
-    let geoJson;
-    let keyPos;
-    let propertyName;
+      switch (saLevel) {
+        case 3:
+          geoJson = JSON.parse(JSON.stringify(SA3));
+          keyPos = 1;
+          propertyName = "SA3_CODE16";
+          break;
+        case 4:
+          geoJson = JSON.parse(JSON.stringify(SA4));
+          keyPos = 0;
+          propertyName = "SA4_CODE16";
+          break;
+        case 2:
+        default:
+          geoJson = JSON.parse(JSON.stringify(SA2));
+          keyPos = 2;
+          propertyName = "SA2_MAIN16";
+          break;
+      }
 
-    switch (saLevel) {
-      case 3:
-        geoJson = JSON.parse(JSON.stringify(SA3));
-        keyPos = 1;
-        propertyName = "SA3_CODE16";
-        break;
-      case 4:
-        geoJson = JSON.parse(JSON.stringify(SA4));
-        keyPos = 0;
-        propertyName = "SA4_CODE16";
-        break;
-      case 2:
-      default:
-        geoJson = JSON.parse(JSON.stringify(SA2));
-        keyPos = 2;
-        propertyName = "SA2_MAIN16";
-        break;
+      const dict = {};
+      for (let i = 0; i < properties.length; i++) {
+        const item = properties[i];
+        const key = item.key[keyPos];
+        dict[key] = item.value;
+        dict[key].mean = dict[key].sum / dict[key].count;
+      }
+      normalize(dict);
+
+      for (let i = 0; i < geoJson.features.length; i++) {
+        const feature = geoJson.features[i];
+        const saCode = feature.properties[propertyName];
+
+        feature.properties.metaData = { ...dict[saCode] };
+        feature.properties.metaData.saCode = saCode;
+        feature.properties.metaData.name =
+          feature.properties[`SA${saLevel}_NAME16`];
+        feature.properties.metaData.category = category;
+      }
+
+      return geoJson;
+    } else {
+      // TODO: process language data
+      return null;
     }
-
-    const dict = {};
-    for (let i = 0; i < properties.length; i++) {
-      const item = properties[i];
-      const key = item.key[keyPos];
-      dict[key] = item.value;
-      dict[key].mean = dict[key].sum / dict[key].count;
-    }
-    normalize(dict);
-
-    for (let i = 0; i < geoJson.features.length; i++) {
-      const feature = geoJson.features[i];
-      const saCode = feature.properties[propertyName];
-
-      feature.properties.metaData = { ...dict[saCode] };
-      feature.properties.metaData.saCode = saCode;
-      feature.properties.metaData.name =
-        feature.properties[`SA${saLevel}_NAME16`];
-    }
-
-    console.log(geoJson);
-
-    return geoJson;
   };
 
   const addDataToMap = async (db, category, saLevel) => {
@@ -122,7 +129,7 @@ const Map = () => {
 
     const data = await fetchData(db, category, saLevel);
 
-    const geoJson = addPropertiesToFeatures(data, saLevel);
+    const geoJson = addPropertiesToFeatures(data, category, saLevel);
     map.data.addGeoJson(geoJson);
     map.data.setStyle((f) => {
       return {
