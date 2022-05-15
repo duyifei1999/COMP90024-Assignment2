@@ -5,7 +5,7 @@ from data_processing.spatial import SpatialTool
 tool = SpatialTool()
 tool.load_region_info("data_processing/SA2_2016_MELB.json")
 db_tweet_name = 'housing'
-db_address = "http://localhost:5984/"
+db_address = "http://172.26.129.154:5984/"
 db_server = couchdb.Server(db_address)
 db_server.resource.credentials = ('admin', 'admin')
 tweets=[]
@@ -13,8 +13,17 @@ file=open('housing.json','w')
 print(db_server)
 for name in db_server:
     print(name)
-for x in db_server['housing']:
-    print(db_server['housing'][x])
+f=open('tweet_housing.json')
+if db_tweet_name in db_server:
+        db_tweets = db_server[db_tweet_name]
+else:
+        db_tweets = db_server.create(db_tweet_name)
+file2=json.load(f)
+for x in file2['rows']:
+    data=x['doc']
+    del data['_id']
+    del data['_rev']
+    db_tweets.save(data)
 
 '''del db_server['housing']
 db_tweets=db_server['tweets_housing']
