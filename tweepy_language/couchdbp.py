@@ -3,9 +3,9 @@ import json
 from textblob import TextBlob
 from data_processing.spatial import SpatialTool
 tool = SpatialTool()
-tool.load_region_info("data_processing/sa2.json")
+tool.load_region_info("data_processing/SA2_2016_MELB.json")
 db_tweet_name = 'language'
-db_address = "http://localhost:5984/"
+db_address = "http://172.26.129.154:5984/"
 db_server = couchdb.Server(db_address)
 db_server.resource.credentials = ('admin', 'admin')
 tweets=[]
