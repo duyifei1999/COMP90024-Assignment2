@@ -1,18 +1,18 @@
 ---
-# Deploy servers
-# - hosts: dbServers
-#   vars_files:
-#     - host_vars/config.yaml
-#   gather_facts: true
-#   roles:
-#     - role: install-couchdb
+Deploy servers
+- hosts: dbServers
+  vars_files:
+    - host_vars/config.yaml
+  gather_facts: true
+  roles:
+    - role: install-couchdb
 
-# - hosts: dbMaster
-#   vars_files:
-#     - host_vars/config.yaml
-#   gather_facts: true
-#   roles:
-#     - role: setup-couchdb-clusters
+- hosts: dbMaster
+  vars_files:
+    - host_vars/config.yaml
+  gather_facts: true
+  roles:
+    - role: setup-couchdb-clusters
 
 - hosts: instance2
   vars_files:
@@ -28,12 +28,12 @@
   roles:
     - role: tweepy-language-setup
     
-# - hosts: instance4
-#   vars_files:
-#     - host_vars/config.yaml
-#   gather_facts: true
-#   roles:
-#     - role: web-setup
+- hosts: instance4
+  vars_files:
+    - host_vars/config.yaml
+  gather_facts: true
+  roles:
+    - role: web-setup
 
 
 
