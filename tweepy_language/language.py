@@ -63,9 +63,9 @@ if __name__ == "__main__":
 
 
     db_tweet_name = 'language'
-    db_address = "http://172.26.129.154:5984/"
+    db_address = "http://admin:admin@172.26.129.154:5984/"
     db_server = couchdb.Server(db_address)
-    db_server.resource.credentials = ('admin', 'admin')
+    # db_server.resource.credentials = ('admin', 'admin')
     print(db_server)
     if db_tweet_name in db_server:
         db_tweets = db_server[db_tweet_name]
