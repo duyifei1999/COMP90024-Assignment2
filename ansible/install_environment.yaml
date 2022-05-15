@@ -1,0 +1,13 @@
+---
+- hosts: instances
+
+  vars_files:
+    - host_vars/config.yaml
+  gather_facts: true
+
+  roles:
+    # - role: add-proxy
+    # - role: add-ssh-key
+    # - role: install-dependencies
+    - role: clone-github-rep
+    # - role: mount-volume

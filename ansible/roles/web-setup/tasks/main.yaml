@@ -1,0 +1,25 @@
+---
+# Create Docker config directory
+- name: Make sure that Docker config directory exists
+  become: yes
+  file:
+    path: '~/.docker'
+    state: 'directory'
+
+# Set Docker proxy for University of Melbourne Research Cloud
+- name: Ensure Docker client proxy settings are present on the server
+  become: yes
+  copy:
+    content: "{{ docker_proxy_settings }}"
+    dest: ~/.docker/config.json
+    
+# Run Docker compose to activate web frontend and web backend
+- name: Run docker compose
+  become: yes
+  docker_compose:
+    project_src: "/home/ubuntu/COMP90024A2/COMP90024-Assignment2/web/"
+    pull: false
+    build: yes
+    state: present
+    remove_orphans: yes
+    recreate: always

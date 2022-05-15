@@ -2,7 +2,7 @@ import _axios from "axios";
 
 const axios = () => {
   const instance = _axios.create({
-    baseURL: "http://localhost:3000/api",
+    baseURL: process.env.REACT_APP_BACKEND_API || "http://localhost:3000/api",
   });
   return instance;
 };
