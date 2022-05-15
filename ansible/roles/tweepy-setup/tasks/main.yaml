@@ -1,6 +1,19 @@
 ---
-# Build Docker image for tweepy_housing and tweepy_language
+# Create Docker config directory
+- name: Make sure that Docker config directory exists
+  become: yes
+  file:
+    path: "~/.docker"
+    state: "directory"
 
+# Set Docker proxy for University of Melbourne Research Cloud
+- name: Ensure Docker client proxy settings are present on the server
+  become: yes
+  copy:
+    content: "{{ docker_proxy_settings }}"
+    dest: ~/.docker/config.json
+
+# Build Docker image for tweepy_housing and tweepy_language
 - name: Build an image and push tweepy_housing
   community.docker.docker_image:
     build:
