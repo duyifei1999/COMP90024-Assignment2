@@ -2,6 +2,7 @@ import * as echarts from 'echarts';
 import React, { useEffect } from "react";
 
 var myChart;
+var sa2code;
 
 var data = {
   "Sa2code": {
@@ -36,13 +37,13 @@ var data = {
     "206051133": 206051133,
     "206051134": 206051134,
     "206061135": 206061135,
-    "206061136": 206061136,
-    "206061137": 206061137,
+    "206061136": 20606113,
     "206061138": 206061138,
     "206071139": 206071139,
     "206071140": 206071140,
     "206071141": 206071141,
-    "206071142": 206071142,
+    "206071142": 2060711426,
+    "206061137": 206061137,
     "206071143": 206071143,
     "206071144": 206071144,
     "206071145": 206071145,
@@ -9068,11 +9069,12 @@ const BarCharts = () => {
         myChart.dispose();
     }
 
-
     var chartDom = document.getElementById('barcharts');
     myChart = echarts.init(chartDom);
     var option;
-    var sa2code = Object.keys(data["Sa2code"]);
+    if (sa2code != undefined){
+      sa2code = Object.keys(data["Sa2code"]);
+    }
     var useful_data = data;
     delete useful_data.Sa2code;
     delete useful_data.Total;
