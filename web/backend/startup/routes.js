@@ -3,7 +3,7 @@ const oldTweets = require("../routes/oldTweets.js");
 const newTweets = require("../routes/newTweets.js");
 
 const oldTweetsDBName = process.env.OLD_TWEETS_DB_NAME || "old_tweets";
-const newTweetsDBName = process.env.NEW_TWEETS_DB_NAME || "tweets";
+const newTweetsDBName = process.env.NEW_TWEETS_DB_NAME || "new_tweets";
 
 module.exports = function (app) {
   app.use(express.json());

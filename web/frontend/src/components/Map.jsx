@@ -50,7 +50,7 @@ const Map = () => {
   const fetchData = async (db, scenario, saLevel) => {
     try {
       if (scenario === "housing") {
-        let query = "".concat(db, "/", scenario, "/");
+        let query = "".concat(db, "/", scenario);
 
         switch (saLevel) {
           case 3:
@@ -246,7 +246,7 @@ const Map = () => {
     <>
       {loading && <Loading />}
       <div className="map-container" id="map" />
-      <DataSelector addDataToMap={addDataToMap} />
+      <DataSelector onDisplay={addDataToMap} />
       <SuburbDetail suburb={suburb} />
     </>
   );
