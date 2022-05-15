@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Select } from "@geist-ui/react";
 
-const DataSelector = ({ addDataToMap }) => {
+const DataSelector = ({ onDisplay }) => {
   const [db, SetDb] = useState(null);
   const [scenario, SetScenario] = useState(null);
   const [saLevel, SetSaLevel] = useState(0);
@@ -56,7 +56,7 @@ const DataSelector = ({ addDataToMap }) => {
       <button
         className="data-selector__display-button"
         onClick={() => {
-          addDataToMap(db, scenario, saLevel);
+          onDisplay(db, scenario, saLevel);
         }}
         disabled={!db || !scenario || !saLevel}
       >

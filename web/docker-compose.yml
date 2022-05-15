@@ -7,8 +7,10 @@ services:
     environment:
       - REACT_APP_GOOGLE_MAP_API_KEY=AIzaSyAuGoFeGv5YvKe63hwNl1JNdAKciL3j2Lo
       - PORT=5000
-      - REACT_APP_NEW_TWEETS_DB_NAME=twitter
       - REACT_APP_OLD_TWEETS_DB_NAME=old_tweets
+      - REACT_APP_NEW_TWEETS_DB_NAME=new_tweets
+      - REACT_APP_NEW_TWEETS_HOUSING_DB_NAME=housing
+      - REACT_APP_NEW_TWEETS_LANGUAGE_DB_NAME=language
       - REACT_APP_BACKEND_API=http://172.26.135.7:3000/api
     ports:
       - 5000:5000
@@ -21,7 +23,9 @@ services:
     environment:
       - CHOUCHDB_HOST=http://admin:admin@172.26.129.154:5984
       - SERVER_PORT=3000
-      - NEW_TWEETS_DB_NAME=twitter
+      - NEW_TWEETS_HOUSING_DB_NAME=housing
+      - NEW_TWEETS_LANGUAGE_DB_NAME=language
+      - NEW_TWEETS_DB_NAME=new_tweets
       - OLD_TWEETS_DB_NAME=old_tweets
     ports:
       - 3000:3000
