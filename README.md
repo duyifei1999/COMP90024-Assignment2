@@ -25,7 +25,7 @@ sudo pip install ansible
 sudo ./nectar.sh
 ```
 ### Deploy services
-Change the key-file name to your own key in one_click_deployment.sh
+Change the key-file name to your own key in 'one_click_deployment.sh' file
 
 ```
 sudo ./one_click_deployment.sh
