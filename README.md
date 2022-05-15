@@ -3,9 +3,9 @@
 
 An cloud based application on the MRC for harvesting tweets through twitter API.
 
-##User guide
+## User guide
 
-###Prerequisites
+### Prerequisites
 1. Login to [https://dashboard.cloud.unimelb.edu.au](https://dashboard.cloud.unimelb.edu.au)
 2. Download openrc.sh with the correct project from Dashboard
 3. Reset API password to get new password for openrc.sh
@@ -14,17 +14,17 @@ An cloud based application on the MRC for harvesting tweets through twitter API.
 6. Connect to the Unimelb Cisco Anyconnect VPN
 
 
-###Install Ansible
+### Install Ansible
 
 ```
 sudo pip install ansible
 ```
-###Create instance
+### Create instance
 
 ```
 sudo ./nectar.sh
 ```
-###Deploy services
+### Deploy services
 Change the key-file name to your own key in one_click_deployment.sh
 
 ```
