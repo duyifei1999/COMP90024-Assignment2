@@ -1,18 +1,18 @@
 ---
 
-# # Create Docker config directory
-# - name: Make sure that Docker config directory exists
-#   become: yes
-#   file:
-#     path: "~/.docker"
-#     state: "directory"
+# Create Docker config directory
+- name: Make sure that Docker config directory exists
+  become: yes
+  file:
+    path: "~/.docker"
+    state: "directory"
 
-# # Set Docker proxy for University of Melbourne Research Cloud
-# - name: Ensure Docker client proxy settings are present on the server
-#   become: yes
-#   copy:
-#     content: "{{ docker_proxy_settings }}"
-#     dest: ~/.docker/config.json
+# Set Docker proxy for University of Melbourne Research Cloud
+- name: Ensure Docker client proxy settings are present on the server
+  become: yes
+  copy:
+    content: "{{ docker_proxy_settings }}"
+    dest: ~/.docker/config.json
 
 # # Build Docker image for tweepy_housing and tweepy_language
 # - name: Build an image and push tweepy_housing
@@ -70,22 +70,27 @@
 #     pull: false
 #     recreate: true
 #     restart_policy: always
-- name: Install tweepy requirement
-  tags: "tweepy"
+# - name: Install tweepy requirement
+  # tags: "tweepy"
+  # become: yes
+  # pip:
+  #   name:
+  #     [
+  #       "tweepy",
+  #       "couchdb",
+  #       "textblob",
+  #       "shapely",
+  #     ]
+  #   state: latest
+  # environment: "{{proxy_env}}"
+- name: stop harvest housing twitter
   become: yes
-  pip:
-    name:
-      [
-        "tweepy",
-        "couchdb",
-        "textblob",
-        "shapely",
-      ]
-    state: latest
-  environment: "{{proxy_env}}"
+  shell: docker-compose down --rmi local
+  args:
+    chdir: /home/ubuntu/COMP90024A2/COMP90024-Assignment2/tweepy_housing
 
 - name: start harvest housing twitter
   become: yes
-  shell: python3 housing.py
+  shell: docker-compose up --build -d
   args:
     chdir: /home/ubuntu/COMP90024A2/COMP90024-Assignment2/tweepy_housing
