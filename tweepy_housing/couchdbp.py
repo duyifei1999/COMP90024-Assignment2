@@ -3,7 +3,7 @@ import json
 from textblob import TextBlob
 from data_processing.spatial import SpatialTool
 tool = SpatialTool()
-tool.load_region_info("data_processing/sa2.json")
+tool.load_region_info("data_processing/SA2_2016_MELB.json")
 db_tweet_name = 'housing'
 db_address = "http://localhost:5984/"
 db_server = couchdb.Server(db_address)
@@ -13,7 +13,8 @@ file=open('housing.json','w')
 print(db_server)
 for name in db_server:
     print(name)
-
+for x in db_server['housing']:
+    print(db_server['housing'][x])
 
 '''del db_server['housing']
 db_tweets=db_server['tweets_housing']
@@ -34,7 +35,7 @@ for x in db_server['tweets']:
                                 data_json['sentiment']=value
                                 db_tweets.save(data_json)
 '''
-for x in db_server['housing']:
+'''for x in db_server['housing']:
     tweets.append(db_server['housing'][x])
 initial=json.dumps(tweets)
-file.write(initial)    
+file.write(initial)    '''
