@@ -1,46 +1,18 @@
 ---
-# Create instances
-- hosts: localhost
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
-  vars_files:
-    - host_vars/nectar.yaml
-  gather_facts: true
-
-  roles:
-    - role: openstack-common
-    - role: openstack-volume
-    - role: openstack-security-group
-    - role: openstack-instance
-
-# Install environment
-- hosts: instances
-
-  vars_files:
-    - host_vars/config.yaml
-  gather_facts: true
-
-  roles:
-    - role: add-proxy
-    - role: add-ssh-key
-    - role: install-dependencies
-    - role: clone-github-rep
-    - role: mount-volume
-
 # Deploy servers
-- hosts: dbServers
-  vars_files:
-    - host_vars/config.yaml
-  gather_facts: true
-  roles:
-    - role: install-couchdb
+# - hosts: dbServers
+#   vars_files:
+#     - host_vars/config.yaml
+#   gather_facts: true
+#   roles:
+#     - role: install-couchdb
 
-- hosts: dbMaster
-  vars_files:
-    - host_vars/config.yaml
-  gather_facts: true
-  roles:
-    - role: setup-couchdb-clusters
+# - hosts: dbMaster
+#   vars_files:
+#     - host_vars/config.yaml
+#   gather_facts: true
+#   roles:
+#     - role: setup-couchdb-clusters
 
 - hosts: instance1
   vars_files:
@@ -49,12 +21,12 @@
   roles:
     - role: tweepy-setup
     
-- hosts: instance4
-  vars_files:
-    - host_vars/config.yaml
-  gather_facts: true
-  roles:
-    - role: web-setup
+# - hosts: instance4
+#   vars_files:
+#     - host_vars/config.yaml
+#   gather_facts: true
+#   roles:
+#     - role: web-setup
 
 
 
