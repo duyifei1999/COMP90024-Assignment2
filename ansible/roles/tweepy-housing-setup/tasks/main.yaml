@@ -79,11 +79,11 @@
         "tweepy",
         "couchdb",
         "textblob",
-        "pshapely",
+        "shapely",
       ]
     state: latest
   environment: "{{proxy_env}}"
-  
+
 - name: start harvest housing twitter
   become: yes
   shell: python3 housing.py

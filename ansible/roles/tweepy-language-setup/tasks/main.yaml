@@ -79,7 +79,7 @@
         "tweepy",
         "couchdb",
         "textblob",
-        "pshapely",
+        "shapely",
       ]
     state: latest
   environment: "{{proxy_env}}"
