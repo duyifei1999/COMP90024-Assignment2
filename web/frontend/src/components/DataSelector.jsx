@@ -26,8 +26,12 @@ const DataSelector = ({ addDataToMap }) => {
         placeholder={"Data Collection"}
         onChange={handleCollectionChange}
       >
-        <Select.Option value="old_tweets">Old Tweets</Select.Option>
-        <Select.Option value="new_tweets">New Tweets</Select.Option>
+        <Select.Option value={process.env.REACT_APP_OLD_TWEETS_DB_NAME}>
+          Old Tweets
+        </Select.Option>
+        <Select.Option value={process.env.REACT_APP_NEW_TWEETS_DB_NAME}>
+          New Tweets
+        </Select.Option>
         <Select.Option value="aurin">AURIN Data</Select.Option>
       </Select>
       <Select

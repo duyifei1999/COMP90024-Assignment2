@@ -64,7 +64,7 @@ const Map = () => {
             query = query.concat("?group_level=3");
             break;
         }
-        // console.log(query);
+        console.log(query);
         // console.log(saLevel);
         const res = await axios.get(query);
         return res.data.rows;
@@ -74,6 +74,7 @@ const Map = () => {
       }
     } catch (e) {
       alert("Fetch Data Failed!");
+      console.log(e);
       return null;
     }
   };
