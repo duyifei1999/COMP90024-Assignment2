@@ -14,6 +14,10 @@ print(db_server)
 for name in db_server:
     print(name)
 f=open('db.json')
+if db_tweet_name in db_server:
+        db_tweets = db_server[db_tweet_name]
+else:
+        db_tweets = db_server.create(db_tweet_name)
 file2=json.load(f)
 for x in file2['rows']:
     data=x['doc']
@@ -27,6 +31,7 @@ for x in file2['rows']:
         if place !='outside melbourne':
             data['sa2']=place
             tweets.append(data)
+            db_tweets.save(data)
 initial=json.dumps(tweets)
 file.write(initial)
 
