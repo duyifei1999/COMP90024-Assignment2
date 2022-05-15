@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import * as echarts from "echarts";
 
+
 class Piecharts extends Component {
   componentDidMount() {
     var myChart = echarts.init(document.getElementById("pie"));

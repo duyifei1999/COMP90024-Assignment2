@@ -4,7 +4,7 @@ import SuburbLanguageDetail from "./SuburbLanguageDetail";
 
 const SuburbDetail = ({ suburb }) => {
   return (
-    <div
+    <div 
       className={
         suburb ? "suburb-container" : "suburb-container suburb-container--empty"
       }
