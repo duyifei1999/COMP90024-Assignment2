@@ -2,22 +2,16 @@ import json
 import sys
 
 def extract_regions_from_file(filepath):
-    data = json.load(open(filepath, 'r'))
-    extracted = []
-    for f in data["features"]:
-        # only want suburbs within the Melbourne region
-        code = f["properties"]["sa2_code"][:3]
-        if "206" <= code <= "213":
-            region = {}
-            region["type"] = "Feature"
-            region["geometry"] = f["geometry"]
-            region["properties"] = {}
-            region["properties"]["sa2_code"] = f["properties"]["sa2_code"]
-            # region["properties"]["sa2_5dig11"] = f["properties"]["sa2_5dig11"]
-            region["properties"]["sa2_name"] = f["properties"]["sa2_name"]
-            extracted.append(region)
+    with open(filepath, 'r') as file:
+        data = json.load(file)
+        extracted = []
+        for f in data["features"]:
+            # only want suburbs within the Melbourne region
+            code = f["properties"]["SA4_CODE16"][:3]
+            if "206" <= code <= "214":
+                extracted.append(f)
 
-    return extracted
+        return extracted
 
 def output_geoJson(extracted):
     geoJson = {}
