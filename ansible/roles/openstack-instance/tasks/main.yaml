@@ -33,7 +33,7 @@
 # Manage the inventory file
 - name: Create inventory file
   copy:
-    content: "[dbServers:children]\ndbMaster\ndbSlave\n\n[dbMaster:children]\ninstance1\n\n[dbSlave:children]\ninstance2\ninstance3\n\n[instances]\n"
+    content: "[dbServers:children]\ndbMaster\ndbSlave\n\n[dbMaster:children]\ninstance1\n\n[dbSlave:children]\ninstance2\ninstance3\n\n[webserver:children]\ninstance4\n\n[instances]\n"
     dest: "inventory/hosts.ini"
 
 

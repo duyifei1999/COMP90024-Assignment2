@@ -1,5 +1,5 @@
 ---
-Deploy servers
+# Deploy servers
 - hosts: dbServers
   vars_files:
     - host_vars/config.yaml
@@ -28,7 +28,7 @@ Deploy servers
   roles:
     - role: tweepy-language-setup
     
-- hosts: instance4
+- hosts: webserver
   vars_files:
     - host_vars/config.yaml
   gather_facts: true

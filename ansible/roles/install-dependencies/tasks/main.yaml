@@ -24,19 +24,6 @@
     install_recommends: no
     update_cache: yes
 
-# - name: Install tweepy requirement
-#   tags: "tweepy"
-#   become: yes
-#   pip:
-#     name:
-#       [
-#         "tweepy",
-#         "couchdb",
-#         "textblob",
-#         "pshapely",
-#       ]
-#     state: latest
-#   environment: "{{proxy_env}}"
 
 # Uninstall old Docker
 - name: Uninstall old versions of docker
