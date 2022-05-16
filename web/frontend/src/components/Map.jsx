@@ -51,7 +51,7 @@ const Map = () => {
   const fetchData = async (db, scenario, saLevel) => {
     try {
       if (scenario === "housing") {
-        let query = "".concat(db, "/", scenario);
+        let query = "http://172.26.135.7:3000/api/".concat(db, "/", scenario);
 
         switch (saLevel) {
           case 3:
@@ -69,7 +69,7 @@ const Map = () => {
         const res = await axios.get(query);
         return res.data.rows;
       } else {
-        let query = "".concat(db, "/", scenario);
+        let query = "http://172.26.135.7:3000/api/".concat(db, "/", scenario);
 
         switch (saLevel) {
           case 3:
