@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import axios from "../helper/axios";
 import featureColor from "../helper/featureColor";
-import normalize from "../helper/normalize";
+import { normalizeHousing, normalizeLanguage } from "../helper/normalize";
 
 import SA2 from "../resources/SA2_2016_MELB.json";
 import SA3 from "../resources/SA3_2016_MELB.json";
 import SA4 from "../resources/SA4_2016_MELB.json";
 import AURINHousing from "../resources/AURIN_melb_housing.json";
 import AURINLanguage from "../resources/AURIN_melb_language.json";
-
 
 import Loading from "./Loading";
 import SuburbDetail from "./SuburbDetail";
@@ -66,12 +65,10 @@ const Map = () => {
             query = query.concat("?group_level=3");
             break;
         }
-        console.log(query);
-        // console.log(saLevel);
+
         const res = await axios.get(query);
         return res.data.rows;
       } else {
-        // TODO: fetch language data
         let query = "".concat(db, "/", scenario);
 
         switch (saLevel) {
@@ -86,8 +83,7 @@ const Map = () => {
             query = query.concat("?group_level=4");
             break;
         }
-        console.log(query);
-        // console.log(saLevel);
+
         const res = await axios.get(query);
         return res.data.rows;
       }
@@ -130,13 +126,23 @@ const Map = () => {
         dict[key] = item.value;
         dict[key].mean = dict[key].sum / dict[key].count;
       }
-      normalize(dict);
+      normalizeHousing(dict);
 
       for (let i = 0; i < geoJson.features.length; i++) {
         const feature = geoJson.features[i];
         const saCode = feature.properties[propertyName];
 
-        feature.properties.metaData = { ...dict[saCode] };
+        if (dict[saCode]) feature.properties.metaData = { ...dict[saCode] };
+        else
+          feature.properties.metaData = {
+            count: 0,
+            mean: 0,
+            normalizedScore: 0,
+            min: 0,
+            max: 0,
+            sum: 0,
+          };
+
         feature.properties.metaData.saCode = saCode;
         feature.properties.metaData.name =
           feature.properties[`SA${saLevel}_NAME16`];
@@ -172,20 +178,28 @@ const Map = () => {
       const dict = {};
       for (let i = 0; i < properties.length; i++) {
         const item = properties[i];
+        const lang = item.key[0];
         const key = item.key[keyPos];
         if (dict[key]) {
-          dict[key][item.key[keyPos]] = item.value;
-        }else {
-          dict[key] = {}
-          dict[key][item.key[keyPos]] = item.value;
+          dict[key].language[lang] =
+            ((dict[key].language && dict[key].language[lang]) || 0) +
+            item.value;
+          dict[key].count += 1;
+        } else {
+          dict[key] = { language: {}, count: 1 };
+          dict[key].language[lang] = item.value;
         }
       }
+
+      normalizeLanguage(dict);
 
       for (let i = 0; i < geoJson.features.length; i++) {
         const feature = geoJson.features[i];
         const saCode = feature.properties[propertyName];
 
-        feature.properties.metaData = { ...dict[saCode] };
+        if (dict[saCode]) feature.properties.metaData = { ...dict[saCode] };
+        else feature.properties.metaData = { count: 0, language: {} };
+
         feature.properties.metaData.saCode = saCode;
         feature.properties.metaData.name =
           feature.properties[`SA${saLevel}_NAME16`];
@@ -240,13 +254,23 @@ const Map = () => {
       Object.keys(dict).forEach((key) => {
         dict[key].mean = dict[key].sum / dict[key].count;
       });
-      normalize(dict);
+      normalizeHousing(dict, "mean");
 
       for (let i = 0; i < geoJson.features.length; i++) {
         const feature = geoJson.features[i];
         const saCode = feature.properties[propertyName];
 
-        feature.properties.metaData = { ...dict[saCode] };
+        if (dict[saCode]) feature.properties.metaData = { ...dict[saCode] };
+        else
+          feature.properties.metaData = {
+            count: 0,
+            mean: 0,
+            normalizedScore: 0,
+            min: 0,
+            max: 0,
+            sum: 0,
+          };
+
         feature.properties.metaData.saCode = saCode;
         feature.properties.metaData.name =
           feature.properties[`SA${saLevel}_NAME16`];
@@ -274,7 +298,6 @@ const Map = () => {
         case 2:
         default:
           geoJson = JSON.parse(JSON.stringify(SA2));
-          console.log(geoJson);
           keyLength = 9;
           propertyName = "SA2_MAIN16";
           break;
@@ -284,25 +307,28 @@ const Map = () => {
       Object.entries(AURINLanguage).forEach(([saCode, data]) => {
         const key = saCode.substring(0, keyLength);
         if (dict[key]) {
-          for (var lang in data) {
-            if (data.hasOwnProperty(lang)) {
-              dict[key][lang] += data[lang];
-            }
-          }
+          dict[key].count += data.Total;
+          Object.entries(data).forEach(([lang, cnt]) => {
+            if (lang !== "Total")
+              dict[key].language[lang] = (dict[key].language[lang] || 0) + cnt;
+          });
         } else {
-          dict[key] = {};
-          for (var lang in data) {
-            if (data.hasOwnProperty(lang)) {
-              dict[key][lang] = data[lang];
-            }
-          }
+          dict[key] = { language: {}, count: data.Total };
+          Object.entries(data).forEach(([lang, cnt]) => {
+            if (lang !== "Total") dict[key].language[lang] = cnt;
+          });
         }
       });
+
+      normalizeLanguage(dict);
 
       for (let i = 0; i < geoJson.features.length; i++) {
         const feature = geoJson.features[i];
         const saCode = feature.properties[propertyName];
-        feature.properties.metaData = { ...dict[saCode] };
+
+        if (dict[saCode]) feature.properties.metaData = { ...dict[saCode] };
+        else feature.properties.metaData = { count: 0, language: {} };
+
         feature.properties.metaData.saCode = saCode;
         feature.properties.metaData.name =
           feature.properties[`SA${saLevel}_NAME16`];
@@ -324,16 +350,19 @@ const Map = () => {
 
     map.data.addListener("mouseover", (e) => {
       map.data.overrideStyle(e.feature, { strokeWeight: 0.3 });
-      SetSuburb(e.feature.getProperty("metaData"));
     });
     map.data.addListener("mouseout", (e) => {
       map.data.revertStyle();
-      SetSuburb(null);
+      // SetSuburb(null);
+    });
+    map.data.addListener("click", (e) => {
+      SetSuburb(e.feature.getProperty("metaData"));
     });
   };
 
   const addDataToMap = async (db, scenario, saLevel) => {
     SetLoading(true);
+    SetSuburb(null);
     clearMap();
 
     let geoJson;
@@ -364,7 +393,7 @@ const Map = () => {
       {loading && <Loading />}
       <div className="map-container" id="map" />
       <DataSelector onDisplay={addDataToMap} />
-      <SuburbDetail suburb={suburb} />
+      <SuburbDetail suburb={suburb} handleClose={() => SetSuburb(null)} />
     </>
   );
 };

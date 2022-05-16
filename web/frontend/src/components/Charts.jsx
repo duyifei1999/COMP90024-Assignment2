@@ -1,284 +1,282 @@
-import Piecharts from "./PieCharts";
-import Linecharts from "./LineCharts";
-import Barcharts from "./BarCharts";
+import React, { useEffect, useState } from "react";
+import ReactECharts from "echarts-for-react";
+import axios from "../helper/axios";
+import Loading from "./Loading";
+
+import AURINHousing from "../resources/AURIN_melb_housing.json";
+import AURINLanguage from "../resources/AURIN_melb_language.json";
+
+const sa4 = {
+  206: "Melb Inner",
+  207: "Melb Inner East",
+  208: "Melb Inner South",
+  209: "Melb North East",
+  210: "Melb North West",
+  211: "Melb Outer East",
+  212: "Melb South East",
+  213: "Melb West",
+  214: "Mornington Peninsula",
+};
 
 const Charts = () => {
+  const [options, SetOptions] = useState(null);
+  const [loading, SetLoading] = useState(true);
 
-/*  const fetchData = async (db, scenario, saLevel) => {
-    try {
-      if (scenario === "housing") {
-        let query = "".concat(db, "/", scenario);
-
-        switch (saLevel) {
-          case 3:
-            query = query.concat("?group_level=2");
-            break;
-          case 4:
-            query = query.concat("?group_level=1");
-            break;
-          case 2:
-          default:
-            query = query.concat("?group_level=3");
-            break;
-        }
-        console.log(query);
-        // console.log(saLevel);
-        const res = await axios.get(query);
-        return res.data.rows;
-      } else {
-        // TODO: fetch language data
-        let query = "".concat(db, "/", scenario);
-
-        switch (saLevel) {
-          case 3:
-            query = query.concat("?group_level=3");
-            break;
-          case 4:
-            query = query.concat("?group_level=2");
-            break;
-          case 2:
-          default:
-            query = query.concat("?group_level=4");
-            break;
-        }
-        console.log(query);
-        // console.log(saLevel);
-        const res = await axios.get(query);
-        return res.data.rows;
-      }
-    } catch (e) {
-      alert("Fetch Data Failed!");
-      console.log(e);
-      return null;
-    }
-  };
-
-  const addPropertiesToFeatures = (properties, scenario, saLevel) => {
-    if (scenario === "housing") {
-      let geoJson;
-      let keyPos;
-      let propertyName;
-
-      switch (saLevel) {
-        case 3:
-          geoJson = JSON.parse(JSON.stringify(SA3));
-          keyPos = 1;
-          propertyName = "SA3_CODE16";
-          break;
-        case 4:
-          geoJson = JSON.parse(JSON.stringify(SA4));
-          keyPos = 0;
-          propertyName = "SA4_CODE16";
-          break;
-        case 2:
-        default:
-          geoJson = JSON.parse(JSON.stringify(SA2));
-          keyPos = 2;
-          propertyName = "SA2_MAIN16";
-          break;
-      }
-
-      const dict = {};
-      for (let i = 0; i < properties.length; i++) {
-        const item = properties[i];
-        const key = item.key[keyPos];
-        dict[key] = item.value;
-        dict[key].mean = dict[key].sum / dict[key].count;
-      }
-      normalize(dict);
-
-      for (let i = 0; i < geoJson.features.length; i++) {
-        const feature = geoJson.features[i];
-        const saCode = feature.properties[propertyName];
-
-        feature.properties.metaData = { ...dict[saCode] };
-        feature.properties.metaData.saCode = saCode;
-        feature.properties.metaData.name =
-          feature.properties[`SA${saLevel}_NAME16`];
-        feature.properties.metaData.scenario = scenario;
-      }
-
-      return geoJson;
-    } else {
-      // TODO: process language data
-      let geoJson;
-      let keyPos;
-      let propertyName;
-
-      switch (saLevel) {
-        case 3:
-          geoJson = JSON.parse(JSON.stringify(SA3));
-          keyPos = 2;
-          propertyName = "SA3_CODE16";
-          break;
-        case 4:
-          geoJson = JSON.parse(JSON.stringify(SA4));
-          keyPos = 1;
-          propertyName = "SA4_CODE16";
-          break;
-        case 2:
-        default:
-          geoJson = JSON.parse(JSON.stringify(SA2));
-          keyPos = 3;
-          propertyName = "SA2_MAIN16";
-          break;
-      }
-
-      const dict = {};
-      for (let i = 0; i < properties.length; i++) {
-        const item = properties[i];
-        const key = item.key[keyPos];
-        if (dict[key]) {
-          dict[key][item.key[keyPos]] = item.value;
-        }else {
-          dict[key] = {}
-          dict[key][item.key[keyPos]] = item.value;
-        }
-      }
-
-      for (let i = 0; i < geoJson.features.length; i++) {
-        const feature = geoJson.features[i];
-        const saCode = feature.properties[propertyName];
-
-        feature.properties.metaData = { ...dict[saCode] };
-        feature.properties.metaData.saCode = saCode;
-        feature.properties.metaData.name =
-          feature.properties[`SA${saLevel}_NAME16`];
-        feature.properties.metaData.scenario = scenario;
-      }
-      return geoJson;
-    }
-  };
-
-  const addAURINPropertiesToFeatures = (scenario, saLevel) => {
-    if (scenario === "housing") {
-      let geoJson;
-      let keyLength;
-      let propertyName;
-
-      switch (saLevel) {
-        case 3:
-          geoJson = JSON.parse(JSON.stringify(SA3));
-          keyLength = 5;
-          propertyName = "SA3_CODE16";
-          break;
-        case 4:
-          geoJson = JSON.parse(JSON.stringify(SA4));
-          keyLength = 3;
-          propertyName = "SA4_CODE16";
-          break;
-        case 2:
-        default:
-          geoJson = JSON.parse(JSON.stringify(SA2));
-          keyLength = 9;
-          propertyName = "SA2_MAIN16";
-          break;
-      }
-
-      const dict = {};
-      Object.entries(AURINHousing).forEach(([saCode, score]) => {
-        const key = saCode.substring(0, keyLength);
-        if (dict[key]) {
-          dict[key].sum += score;
-          dict[key].count += 1;
-          dict[key].min = dict[key].min < score ? dict[key].min : score;
-          dict[key].max = dict[key].max > score ? dict[key].max : score;
-        } else {
-          dict[key] = {};
-          dict[key].sum = score;
-          dict[key].count = 1;
-          dict[key].min = score;
-          dict[key].max = score;
-        }
+  useEffect(() => {
+    const processLanguageData = (oldRawData, newRawData) => {
+      const oldData = [];
+      Object.entries(oldRawData).forEach(([index, item]) => {
+        oldData.push({ value: item.value, name: item.key[0] });
       });
 
-      Object.keys(dict).forEach((key) => {
-        dict[key].mean = dict[key].sum / dict[key].count;
+      const newData = [];
+      Object.entries(newRawData).forEach(([index, item]) => {
+        newData.push({ value: item.value, name: item.key[0] });
       });
-      normalize(dict);
 
-      for (let i = 0; i < geoJson.features.length; i++) {
-        const feature = geoJson.features[i];
-        const saCode = feature.properties[propertyName];
+      const options = {
+        title: {
+          text: "Language Count of Tweets in Melbourne",
+          left: "center",
+          textStyle: {
+            fontSize: 30,
+          },
+        },
+        tooltip: {
+          show: true,
+          trigger: "item",
+        },
+        series: [
+          {
+            name: "Old Twitter Set",
+            data: oldData,
+            type: "pie",
+            smooth: true,
+            center: ["20%", "50%"],
+            top: "10%",
+          },
+          {
+            name: "New Twitter Set",
+            data: newData,
+            type: "pie",
+            smooth: true,
+            center: ["80%", "50%"],
+            top: "10%",
+          },
+        ],
+      };
 
-        feature.properties.metaData = { ...dict[saCode] };
-        feature.properties.metaData.saCode = saCode;
-        feature.properties.metaData.name =
-          feature.properties[`SA${saLevel}_NAME16`];
-        feature.properties.metaData.scenario = scenario;
-      }
+      return options;
+    };
 
-      return geoJson;
-    } else {
-      // TODO: process language data
-      let geoJson;
-      let keyLength;
-      let propertyName;
+    const processHousingData = (oldRawData, newRawData) => {
+      const xAxis = [];
+      const oldData = [];
+      Object.entries(sa4).forEach(([saCode, name]) => {
+        xAxis.push(name);
+        Object.entries(oldRawData).forEach(([index, item]) => {
+          if (item.key[0] === saCode)
+            oldData.push(item.value.sum / item.value.count);
+        });
+      });
 
-      switch (saLevel) {
-        case 3:
-          geoJson = JSON.parse(JSON.stringify(SA3));
-          keyLength = 5;
-          propertyName = "SA3_CODE16";
-          break;
-        case 4:
-          geoJson = JSON.parse(JSON.stringify(SA4));
-          keyLength = 3;
-          propertyName = "SA4_CODE16";
-          break;
-        case 2:
-        default:
-          geoJson = JSON.parse(JSON.stringify(SA2));
-          console.log(geoJson);
-          keyLength = 9;
-          propertyName = "SA2_MAIN16";
-          break;
-      }
+      const newData = [];
+      Object.entries(sa4).forEach(([saCode, name]) => {
+        Object.entries(newRawData).forEach(([index, item]) => {
+          if (item.key[0] === saCode)
+            newData.push(item.value.sum / item.value.count);
+        });
+      });
 
+      const options = {
+        tooltip: {
+          show: true,
+          trigger: "item",
+        },
+        title: {
+          text: "Average Sentiment Scores of Tweets Relating to Housing in Melbourne",
+          left: "center",
+          textStyle: {
+            fontSize: 30,
+          },
+        },
+        xAxis: {
+          data: xAxis,
+          type: "category",
+        },
+        yAxis: {
+          type: "value",
+        },
+        series: [
+          {
+            name: "Old Twitter Set",
+            data: oldData,
+            type: "bar",
+            smooth: true,
+          },
+          {
+            name: "new Twitter Set",
+            data: newData,
+            type: "bar",
+            smooth: true,
+          },
+        ],
+      };
+
+      return options;
+    };
+
+    const processAURINLanguageData = () => {
       const dict = {};
       Object.entries(AURINLanguage).forEach(([saCode, data]) => {
-        const key = saCode.substring(0, keyLength);
-        if (dict[key]) {
-          for (var lang in data) {
-            if (data.hasOwnProperty(lang)) {
-              dict[key][lang] += data[lang];
-            }
-          }
+        Object.entries(data).forEach(([lang, cnt]) => {
+          if (lang !== "Total") dict[lang] = (dict[lang] || 0) + cnt;
+        });
+      });
+
+      const data = [];
+      Object.entries(dict).forEach(([lang, cnt]) => {
+        data.push({ value: cnt, name: lang });
+      });
+
+      const options = {
+        title: {
+          text: "Language Statistics from AURIN",
+          left: "center",
+          textStyle: {
+            fontSize: 30,
+          },
+        },
+        tooltip: {
+          show: true,
+          trigger: "item",
+        },
+        series: [
+          {
+            data: data,
+            type: "pie",
+            smooth: true,
+            top: "10%",
+          },
+        ],
+      };
+
+      return options;
+    };
+
+    const processAURINHousingData = () => {
+      const dataDict = {};
+      Object.entries(AURINHousing).forEach(([key, value]) => {
+        const saCode = key.substring(0, 3);
+        if (dataDict[saCode]) {
+          dataDict[saCode].sum = dataDict[saCode].sum + value;
+          dataDict[saCode].count = dataDict[saCode].count + 1;
         } else {
-          dict[key] = {};
-          for (var lang in data) {
-            if (data.hasOwnProperty(lang)) {
-              dict[key][lang] = data[lang];
-            }
-          }
+          dataDict[saCode] = { sum: value, count: 1 };
         }
       });
 
-      for (let i = 0; i < geoJson.features.length; i++) {
-        const feature = geoJson.features[i];
-        const saCode = feature.properties[propertyName];
-        feature.properties.metaData = { ...dict[saCode] };
-        feature.properties.metaData.saCode = saCode;
-        feature.properties.metaData.name =
-          feature.properties[`SA${saLevel}_NAME16`];
-        feature.properties.metaData.scenario = scenario;
-      }
+      const data = [];
+      const xAxis = [];
+      Object.entries(sa4).forEach(([saCode, name]) => {
+        xAxis.push(name);
+        if (dataDict[saCode])
+          data.push(dataDict[saCode].sum / dataDict[saCode].count);
+        else data.push(0);
+      });
 
-      return geoJson;
-    }
-  };
-*/
+      const options = {
+        title: {
+          text: "Housing Scores from AURIN",
+          left: "center",
+          textStyle: {
+            fontSize: 30,
+          },
+        },
+        tooltip: {
+          show: true,
+          trigger: "item",
+        },
+        xAxis: {
+          data: xAxis,
+          type: "category",
+        },
+        yAxis: {
+          type: "value",
+        },
+        series: [
+          {
+            data: data,
+            type: "bar",
+            smooth: true,
+          },
+        ],
+      };
+
+      return options;
+    };
+
+    const fetchData = async () => {
+      try {
+        const newLang = await axios.get("new_tweets/language?group_level=1");
+        const oldLang = await axios.get("old_tweets/language?group_level=1");
+        const newHousing = await axios.get("new_tweets/housing?group_level=1");
+        const oldHousing = await axios.get("old_tweets/housing?group_level=1");
+
+        const languageOptions = processLanguageData(
+          oldLang.data.rows,
+          newLang.data.rows
+        );
+        const housingOptions = processHousingData(
+          oldHousing.data.rows,
+          newHousing.data.rows
+        );
+
+        const AURINlanguageOptions = processAURINLanguageData();
+        const AURINhousingOptions = processAURINHousingData();
+
+        SetOptions({
+          languageOptions,
+          housingOptions,
+          AURINlanguageOptions,
+          AURINhousingOptions,
+        });
+
+        // return language.data.rows;
+      } catch (e) {
+        alert("Fetch Data Failed!");
+        console.log(e);
+        return null;
+      }
+    };
+
+    fetchData();
+    SetLoading(false);
+  }, []);
+
   return (
     <div>
-      <div style={{ display: "inline-block", width: "100vw", height: "50vh"}}>
-        <Linecharts />
-      </div>
-      <div style={{ display: "inline-block", width: "50vw", height: "150vh"}}>
-        <Barcharts />
-      </div>
+      {loading && <Loading />}
+      {options && (
+        <ReactECharts className="barchart" option={options.housingOptions} />
+      )}
+      {options && (
+        <ReactECharts className="piechart" option={options.languageOptions} />
+      )}
+      {options && (
+        <ReactECharts
+          className="barchart"
+          option={options.AURINhousingOptions}
+        />
+      )}
+      {options && (
+        <ReactECharts
+          className="piechart"
+          option={options.AURINlanguageOptions}
+        />
+      )}
     </div>
   );
 };
 
 export default Charts;
-
