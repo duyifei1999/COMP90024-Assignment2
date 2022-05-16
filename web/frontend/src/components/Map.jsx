@@ -8,6 +8,8 @@ import SA2 from "../resources/SA2_2016_MELB.json";
 import SA3 from "../resources/SA3_2016_MELB.json";
 import SA4 from "../resources/SA4_2016_MELB.json";
 import AURINHousing from "../resources/AURIN_melb_housing.json";
+import AURINLanguage from "../resources/AURIN_melb_language.json";
+
 
 import Loading from "./Loading";
 import SuburbDetail from "./SuburbDetail";
@@ -70,7 +72,24 @@ const Map = () => {
         return res.data.rows;
       } else {
         // TODO: fetch language data
-        return null;
+        let query = "".concat(db, "/", scenario);
+
+        switch (saLevel) {
+          case 3:
+            query = query.concat("?group_level=3");
+            break;
+          case 4:
+            query = query.concat("?group_level=2");
+            break;
+          case 2:
+          default:
+            query = query.concat("?group_level=4");
+            break;
+        }
+        console.log(query);
+        // console.log(saLevel);
+        const res = await axios.get(query);
+        return res.data.rows;
       }
     } catch (e) {
       alert("Fetch Data Failed!");
@@ -127,7 +146,52 @@ const Map = () => {
       return geoJson;
     } else {
       // TODO: process language data
-      return null;
+      let geoJson;
+      let keyPos;
+      let propertyName;
+
+      switch (saLevel) {
+        case 3:
+          geoJson = JSON.parse(JSON.stringify(SA3));
+          keyPos = 2;
+          propertyName = "SA3_CODE16";
+          break;
+        case 4:
+          geoJson = JSON.parse(JSON.stringify(SA4));
+          keyPos = 1;
+          propertyName = "SA4_CODE16";
+          break;
+        case 2:
+        default:
+          geoJson = JSON.parse(JSON.stringify(SA2));
+          keyPos = 3;
+          propertyName = "SA2_MAIN16";
+          break;
+      }
+
+      const dict = {};
+      for (let i = 0; i < properties.length; i++) {
+        const item = properties[i];
+        const key = item.key[keyPos];
+        if (dict[key]) {
+          dict[key][item.key[keyPos]] = item.value;
+        }else {
+          dict[key] = {}
+          dict[key][item.key[keyPos]] = item.value;
+        }
+      }
+
+      for (let i = 0; i < geoJson.features.length; i++) {
+        const feature = geoJson.features[i];
+        const saCode = feature.properties[propertyName];
+
+        feature.properties.metaData = { ...dict[saCode] };
+        feature.properties.metaData.saCode = saCode;
+        feature.properties.metaData.name =
+          feature.properties[`SA${saLevel}_NAME16`];
+        feature.properties.metaData.scenario = scenario;
+      }
+      return geoJson;
     }
   };
 
@@ -192,7 +256,60 @@ const Map = () => {
       return geoJson;
     } else {
       // TODO: process language data
-      return null;
+      let geoJson;
+      let keyLength;
+      let propertyName;
+
+      switch (saLevel) {
+        case 3:
+          geoJson = JSON.parse(JSON.stringify(SA3));
+          keyLength = 5;
+          propertyName = "SA3_CODE16";
+          break;
+        case 4:
+          geoJson = JSON.parse(JSON.stringify(SA4));
+          keyLength = 3;
+          propertyName = "SA4_CODE16";
+          break;
+        case 2:
+        default:
+          geoJson = JSON.parse(JSON.stringify(SA2));
+          console.log(geoJson);
+          keyLength = 9;
+          propertyName = "SA2_MAIN16";
+          break;
+      }
+
+      const dict = {};
+      Object.entries(AURINLanguage).forEach(([saCode, data]) => {
+        const key = saCode.substring(0, keyLength);
+        if (dict[key]) {
+          for (var lang in data) {
+            if (data.hasOwnProperty(lang)) {
+              dict[key][lang] += data[lang];
+            }
+          }
+        } else {
+          dict[key] = {};
+          for (var lang in data) {
+            if (data.hasOwnProperty(lang)) {
+              dict[key][lang] = data[lang];
+            }
+          }
+        }
+      });
+
+      for (let i = 0; i < geoJson.features.length; i++) {
+        const feature = geoJson.features[i];
+        const saCode = feature.properties[propertyName];
+        feature.properties.metaData = { ...dict[saCode] };
+        feature.properties.metaData.saCode = saCode;
+        feature.properties.metaData.name =
+          feature.properties[`SA${saLevel}_NAME16`];
+        feature.properties.metaData.scenario = scenario;
+      }
+
+      return geoJson;
     }
   };
 

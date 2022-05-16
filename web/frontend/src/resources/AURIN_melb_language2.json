@@ -1,10 +1,4 @@
-import * as echarts from 'echarts';
-import React, { useEffect } from "react";
-
-var myChart;
-var sa2code;
-
-var data = {
+{
   "Sa2code": {
     "206011105": 206011105,
     "206011106": 206011106,
@@ -37,13 +31,13 @@ var data = {
     "206051133": 206051133,
     "206051134": 206051134,
     "206061135": 206061135,
-    "206061136": 20606113,
+    "206061136": 206061136,
+    "206061137": 206061137,
     "206061138": 206061138,
     "206071139": 206071139,
     "206071140": 206071140,
     "206071141": 206071141,
-    "206071142": 2060711426,
-    "206061137": 206061137,
+    "206071142": 206071142,
     "206071143": 206071143,
     "206071144": 206071144,
     "206071145": 206071145,
@@ -9061,81 +9055,4 @@ var data = {
     "214021384": 3,
     "214021385": 3
   }
-};
-
-const BarCharts = () => {
-    const chartview = () => {
-      if (myChart != null && myChart != "" && myChart != undefined) {
-        myChart.dispose();
-    }
-
-    var chartDom = document.getElementById('barcharts');
-    myChart = echarts.init(chartDom);
-    var option;
-    if (sa2code != undefined){
-      sa2code = Object.keys(data["Sa2code"]);
-    }
-    var useful_data = data;
-    delete useful_data.Sa2code;
-    delete useful_data.Total;
-    delete useful_data.English;
-    var theseries = new Array();
-    for (var key in useful_data){
-      theseries.push(
-        {
-          "name": key,
-          "type": 'bar',
-          "stack": 'total',
-          "label": 
-          {
-            "show": true
-          },
-          "emphasis": 
-          {
-            "focus": 'series'
-          },
-          "data":Object.values(data[key])
-        }
-      );
-    }
-    console.log(theseries);
-
-    option = {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          // Use axis to trigger tooltip
-          type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
-        }
-      },
-      legend: {},
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-      xAxis: {
-        type: 'value'
-      },
-      yAxis: {
-        type: 'category',
-        data: sa2code
-      },
-      series: theseries
-    };
-    option && myChart.setOption(option);
-  }
-
-  useEffect(() => {
-    chartview({})
-  });
-
-  return (
-  <>
-    <div id="barcharts"  style={{ width: "100vw", height: "150vh" }} />
-  </>
-  );
 }
-
-export default BarCharts;
