@@ -72,7 +72,7 @@ const Home = () => {
           />
           <MemberDetail
             name="Yifei Du"
-            sid="1234567"
+            sid="1260227"
             degree="Master of Computer Science"
             role="Full-Stack Engineer"
           />
