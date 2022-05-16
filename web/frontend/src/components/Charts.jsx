@@ -115,7 +115,7 @@ const Charts = () => {
             smooth: true,
           },
           {
-            name: "new Twitter Set",
+            name: "New Twitter Set",
             data: newData,
             type: "bar",
             smooth: true,

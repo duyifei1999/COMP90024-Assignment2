@@ -26,19 +26,22 @@ const Home = () => {
           <div id="info">
             <h1>About</h1>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab
-              dolorem, quos error odio animi libero cupiditate expedita! Facere
-              molestias ea, et architecto praesentium, quaerat quam harum, ex
-              ipsam dolorum quae.
+              The topic of liveability has gained significant attention through
+              social media platforms over the recent years. Nowadays, Twitter is
+              one of the most popular online social media platforms, where users
+              can share and communicate their opinions with each other from all
+              over the world. Given the increasing popularity and importance of
+              online social media networks such as Twitter, it is not surprising
+              that a tremendous amount of sharing and discussion of information
+              has occurred in such platforms.
               <br />
               <br />
-              Iste, alias excepturi sit animi voluptate vitae fugiat vel illum
-              doloremque corrupti blanditiis est temporibus laudantium
-              dignissimos modi ab autem facilis architecto! Beatae quas officiis
-              nostrum perspiciatis modi dicta perferendis! Vero quis aliquid ut
-              illo, eos tempora omnis nostrum iure totam nemo id, nesciunt esse
-              voluptas quisquam incidunt illum quibusdam in consequatur
-              voluptate? Aut officia aliquid illo ab, dolore esse.
+              With respect to the indicators of Melbourne housing and
+              opportunity, the objective of the scenario that was chosen for
+              this assignment was to analyze the liveability of Melbourne by
+              harvesting tweets. Meanwhile, statistical data could be downloaded
+              from the Australian Urban Research Infrastructure Network (AURIN)
+              and thereby be used to compare with the twitter data.
             </p>
           </div>
           <div id="melmap"></div>
