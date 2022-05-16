@@ -27,6 +27,7 @@ services:
       - NEW_TWEETS_LANGUAGE_DB_NAME=language
       - NEW_TWEETS_DB_NAME=new_tweets
       - OLD_TWEETS_DB_NAME=old_tweets
+      - CORS_WHITELIST=http://172.26.135.7:5000
     ports:
       - 3000:3000
     image: backend

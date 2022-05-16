@@ -218,18 +218,10 @@ const Charts = () => {
 
     const fetchData = async () => {
       try {
-        const newLang = await axios.get(
-          "http://172.26.135.7:3000/api/new_tweets/language?group_level=1"
-        );
-        const oldLang = await axios.get(
-          "http://172.26.135.7:3000/api/old_tweets/language?group_level=1"
-        );
-        const newHousing = await axios.get(
-          "http://172.26.135.7:3000/api/new_tweets/housing?group_level=1"
-        );
-        const oldHousing = await axios.get(
-          "http://172.26.135.7:3000/api/old_tweets/housing?group_level=1"
-        );
+        const newLang = await axios.get("new_tweets/language?group_level=1");
+        const oldLang = await axios.get("old_tweets/language?group_level=1");
+        const newHousing = await axios.get("new_tweets/housing?group_level=1");
+        const oldHousing = await axios.get("old_tweets/housing?group_level=1");
 
         const languageOptions = processLanguageData(
           oldLang.data.rows,
