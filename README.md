@@ -31,6 +31,6 @@ Change the key-file name to your own key in 'one_click_deployment.sh' file
 sudo ./one_click_deployment.sh
 ```
 ### Web frontend:
-please go to [http://172.26.135.7:5000](https://172.26.135.7:5000)
+please go to 172.26.135.7:5000
 ### CouchDB master: 
-please go to [http://172.26.129.154:5984/_utils](https://172.26.129.154:5984/_utils)
+please go to 172.26.129.154:5984/_utils
